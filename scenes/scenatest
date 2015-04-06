@@ -1,0 +1,79 @@
+Transform {
+	translation 3 0 0
+	scale 2 2 2
+	Object {
+		geometry "box3.obj"
+		material "shader/normal"
+		params "kDiff = 0.2 0.4 0.6 kSpec = 0.4 0.4 0.4 kAmb = 0.3 0.2 0.1 kEmi = 0.0 0.0 0.0 m = 164"
+		texture0 "diffuseMap" "bricks.tga"
+		texture1 "normalMap" "normal.tga"
+	}
+	Transform {
+		translation  0 3 0
+		
+		Object {
+			geometry "box3.obj"
+			material "shader/phongblinn_map"
+			params "kDiff = 0.2 0.4 0.6 kSpec = 0.4 0.4 0.4 kAmb = 0.3 0.2 0.1 kEmi = 0.0 0.0 0.0 m = 164"
+			texture0 "diffuseMap" "bricks.tga"
+			texture1 "specularMap" "bricks_specular.tga"
+		}
+	}
+}
+Transform {
+	translation -3 0 0
+	scale 2 2 2
+	Object {
+		geometry "box3.obj"
+		material "shader/cooktorrance"
+		params "kDiff = 0.3 0.2 0.1 kSpec = 0.3 0.2 0.1 kAmb = 0.2 0.1 0.0 kEmi = 0.0 0.0 0.0 m = 1"
+		texture0 "diffuseMap" "bricks.tga"
+		texture1 "normalMap" "normal.tga"
+	}
+	Transform {
+		translation  0 3 0
+		
+		Object {
+			geometry "box3.obj"
+			material "shader/phongblinn"
+			params "kDiff = 0.2 0.4 0.6 kSpec = 0.4 0.4 0.4 kAmb = 0.3 0.2 0.1 kEmi = 0.0 0.0 0.0 m = 164"
+			texture0 "diffuseMap" "bricks.tga"
+			texture1 "normalMap" "normal.tga"
+		}
+	}
+}
+Camera {
+	position 0 0 10
+	direction 0 0 -1
+	up 0 1 0
+	FOVy 60 # commento in camera	 
+}
+Camera {
+	position 0 0 10
+	direction 0 0 -1
+	up 0 1 0
+	FOVy 60 # commento in camera
+	screenEffect "shader/sepia"
+	 
+}
+Camera {
+	position 0 0 10
+	direction 0 0 -1
+	up 0 1 0
+	FOVy 60 # commento in camera
+	screenEffect "shader/sharpen"
+	 
+}
+Camera {
+	position 0 0 10
+	direction 0 0 -1
+	up 0 1 0
+	FOVy 60 # commento in camera
+	screenEffect "shader/blur3x3"
+	 
+}
+Light {
+	position 0 0 6 1
+	irradiance 1 1 1
+}
+\n

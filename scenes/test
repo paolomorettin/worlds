@@ -1,0 +1,18 @@
+Transform {
+	scale 3 3 3
+	Object {
+		geometry "teapot.obj"
+		material "shader/phongblinn"
+		params "kDiff = 0.2 0.4 0.6 kSpec = 0.0 0.0 0.0 kAmb = 0.0 0.0 0.0 kEmi = 0.0 0.0 0.0 m = 64"
+	}
+}
+Camera {
+	position 0 0 20
+	direction 0 0 -1
+	up 0 1 0
+	FOVy 60	
+}
+Light {
+	position 0 0 60 1
+	irradiance 1 1 1
+}

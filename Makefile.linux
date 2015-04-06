@@ -1,0 +1,17 @@
+CC=g++
+CFLAGS=-c
+LDFLAGS=-lGL -lGLEW -lGLU -lglut
+SOURCES=AABoundingBox.cpp BoundingVolumeHierarchy.cpp BVHNode.cpp CameraManager.cpp FreeCameraManager.cpp Geometry.cpp InputControl.cpp main.cpp Matrix.cpp ParserScene.cpp RadialCameraManager.cpp Scene.cpp SceneCamera.cpp SceneContentManager.cpp SceneLight.cpp SceneObject.cpp SceneTransform.cpp SceneTreeNode.cpp Shader.cpp Texture.cpp util.cpp Vector.cpp objParser/list.cpp objParser/objLoader.cpp objParser/obj_parser.cpp objParser/string_extra.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=grigio.out
+
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+clean:
+	rm -f $(EXECUTABLE) $(OBJECTS)
+
+
