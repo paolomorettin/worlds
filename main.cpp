@@ -1,155 +1,206 @@
-#include <irrlicht.h>
+/** Example 002 Quake3Map
 
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
+This Tutorial shows how to load a Quake 3 map into the engine, create a
+SceneNode for optimizing the speed of rendering, and how to create a user
+controlled camera.
+
+Please note that you should know the basics of the engine before starting this
+tutorial. Just take a short look at the first tutorial, if you haven't done
+this yet: http://irrlicht.sourceforge.net/tut001.html
+
+Lets start like the HelloWorld example: We include the irrlicht header files
+and an additional file to be able to ask the user for a driver type using the
+console.
+*/
+#include <irrlicht.h>
+#include <iostream>
 
 /*
-To be able to use the Irrlicht.DLL file, we need to link with the Irrlicht.lib.
-We could set this option in the project settings, but to make it easy, we use a
-pragma comment lib for VisualStudio. On Windows platforms, we have to get rid
-of the console window, which pops up when starting a program with main(). This
-is done by the second pragma. We could also use the WinMain method, though
-losing platform independence then.
+As already written in the HelloWorld example, in the Irrlicht Engine everything
+can be found in the namespace 'irr'. To get rid of the irr:: in front of the
+name of every class, we tell the compiler that we use that namespace from now
+on, and we will not have to write that 'irr::'. There are 5 other sub
+namespaces 'core', 'scene', 'video', 'io' and 'gui'. Unlike in the HelloWorld
+example, we do not call 'using namespace' for these 5 other namespaces, because
+in this way you will see what can be found in which namespace. But if you like,
+you can also include the namespaces like in the previous example.
 */
-#ifdef _IRR_WINDOWS_
+using namespace irr;
+
+/*
+Again, to be able to use the Irrlicht.DLL file, we need to link with the
+Irrlicht.lib. We could set this option in the project settings, but to make it
+easy, we use a pragma comment lib:
+*/
+#ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
-#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
+/*
+Ok, lets start. Again, we use the main() method as start, not the WinMain().
+*/
 int main()
 {
 	/*
-	parameters:
-
-	- deviceType: Type of the device. This can currently be the Null-device,
-	   one of the two software renderers, D3D8, D3D9, or OpenGL. In this
-	   example we use EDT_SOFTWARE, but to try out, you might want to
-	   change it to EDT_BURNINGSVIDEO, EDT_NULL, EDT_DIRECT3D8,
-	   EDT_DIRECT3D9, or EDT_OPENGL.
-
-	- windowSize: Size of the Window or screen in FullScreenMode to be
-	   created. In this example we use 640x480.
-
-	- bits: Amount of color bits per pixel. This should be 16 or 32. The
-	   parameter is often ignored when running in windowed mode.
-
-	- fullscreen: Specifies if we want the device to run in fullscreen mode
-	   or not.
-
-	- stencilbuffer: Specifies if we want to use the stencil buffer (for
-	   drawing shadows).
-
-	- vsync: Specifies if we want to have vsync enabled, this is only useful
-	   in fullscreen mode.
-
-	- eventReceiver: An object to receive events. We do not want to use this
-	   parameter here, and set it to 0.
+	Like in the HelloWorld example, we create an IrrlichtDevice with
+	createDevice(). The difference now is that we ask the user to select
+	which video driver to use. The Software device might be
+	too slow to draw a huge Quake 3 map, but just for the fun of it, we make
+	this decision possible, too.
+	Instead of copying this whole code into your app, you can simply include
+	driverChoice.h from Irrlicht's include directory. The function
+	driverChoiceConsole does exactly the same.
 	*/
-	IrrlichtDevice *device =
-		createDevice( video::EDT_SOFTWARE, dimension2d<u32>(640, 480), 16,
-			false, false, false, 0);
 
-	if (!device)
-		return 1;
+	// ask user for driver
 
-	device->setWindowCaption(L"Worlds");
+	video::E_DRIVER_TYPE driverType;
 
-	/*
-	Get a pointer to the VideoDriver, the SceneManager and the graphical
-	user interface environment, so that we do not always have to write
-	device->getVideoDriver(), device->getSceneManager(), or
-	device->getGUIEnvironment().
-	*/
-	IVideoDriver* driver = device->getVideoDriver();
-	ISceneManager* smgr = device->getSceneManager();
-	IGUIEnvironment* guienv = device->getGUIEnvironment();
+	printf("Please select the driver you want for this example:\n"\
+		" (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"\
+		" (d) Burning's Software Renderer\n (e) Software Renderer\n"\
+		" (f) NullDevice\n (otherKey) exit\n\n");
 
-	/*
-	We add a hello world label to the window, using the GUI environment.
-	The text is placed at the position (10,10) as top left corner and
-	(260,22) as lower right corner.
-	*/
-	guienv->addStaticText(L"Hello World! This is the Irrlicht Software renderer!",
-		rect<s32>(10,10,790,200), true);
+	char i;
+	std::cin >> i;
 
-	/*
-	To show something interesting, we load a Quake 2 model and display it.
-	We only have to get the Mesh from the Scene Manager with getMesh() and add
-	a SceneNode to display the mesh with addAnimatedMeshSceneNode(). We
-	check the return value of getMesh() to become aware of loading problems
-	and other errors.
-
-	Instead of writing the filename sydney.md2, it would also be possible
-	to load a Maya object file (.obj), a complete Quake3 map (.bsp) or any
-	other supported file format. By the way, that cool Quake 2 model
-	called sydney was modelled by Brian Collins.
-	*/
-	IAnimatedMesh* mesh = smgr->getMesh("./media/sydney.md2");
-	if (!mesh)
+	switch(i)
 	{
-		device->drop();
-		return 1;
+		case 'a': driverType = video::EDT_OPENGL;   break;
+		case 'b': driverType = video::EDT_DIRECT3D9;break;
+		case 'c': driverType = video::EDT_DIRECT3D8;break;
+		case 'd': driverType = video::EDT_BURNINGSVIDEO;break;
+		case 'e': driverType = video::EDT_SOFTWARE; break;
+		case 'f': driverType = video::EDT_NULL;     break;
+		default: return 1;
 	}
-	IAnimatedMeshSceneNode* node = smgr->addAnimatedMeshSceneNode( mesh );
+
+	// create device and exit if creation failed
+
+	IrrlichtDevice *device =
+		createDevice(driverType, core::dimension2d<u32>(800, 600));
+
+	if (device == 0)
+		return 1; // could not create selected driver.
 
 	/*
-	To let the mesh look a little bit nicer, we change its material. We
-	disable lighting because we do not have a dynamic light in here, and
-	the mesh would be totally black otherwise. Then we set the frame loop,
-	such that the predefined STAND animation is used. And last, we apply a
-	texture to the mesh. Without it the mesh would be drawn using only a
-	color.
+	Get a pointer to the video driver and the SceneManager so that
+	we do not always have to call irr::IrrlichtDevice::getVideoDriver() and
+	irr::IrrlichtDevice::getSceneManager().
+	*/
+	video::IVideoDriver* driver = device->getVideoDriver();
+	scene::ISceneManager* smgr = device->getSceneManager();
+
+	/*
+	To display the Quake 3 map, we first need to load it. Quake 3 maps
+	are packed into .pk3 files which are nothing else than .zip files.
+	So we add the .pk3 file to our irr::io::IFileSystem. After it was added,
+	we are able to read from the files in that archive as if they are
+	directly stored on the disk.
+	*/
+	device->getFileSystem()->addFileArchive("./media/map-20kdm2.pk3");
+
+	/*
+	Now we can load the mesh by calling
+	irr::scene::ISceneManager::getMesh(). We get a pointer returned to an
+	irr::scene::IAnimatedMesh. As you might know, Quake 3 maps are not
+	really animated, they are only a huge chunk of static geometry with
+	some materials attached. Hence the IAnimatedMesh consists of only one
+	frame, so we get the "first frame" of the "animation", which is our
+	quake level and create an Octree scene node with it, using
+	irr::scene::ISceneManager::addOctreeSceneNode().
+	The Octree optimizes the scene a little bit, trying to draw only geometry
+	which is currently visible. An alternative to the Octree would be a
+	irr::scene::IMeshSceneNode, which would always draw the complete
+	geometry of the mesh, without optimization. Try it: Use
+	irr::scene::ISceneManager::addMeshSceneNode() instead of
+	addOctreeSceneNode() and compare the primitives drawn by the video
+	driver. (There is a irr::video::IVideoDriver::getPrimitiveCountDrawn()
+	method in the irr::video::IVideoDriver class). Note that this
+	optimization with the Octree is only useful when drawing huge meshes
+	consisting of lots of geometry.
+	*/
+	scene::IAnimatedMesh* mesh = smgr->getMesh("20kdm2.bsp");
+	scene::ISceneNode* node = 0;
+
+	if (mesh)
+		node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
+//		node = smgr->addMeshSceneNode(mesh->getMesh(0));
+
+	/*
+	Because the level was not modelled around the origin (0,0,0), we
+	translate the whole level a little bit. This is done on
+	irr::scene::ISceneNode level using the methods
+	irr::scene::ISceneNode::setPosition() (in this case),
+	irr::scene::ISceneNode::setRotation(), and
+	irr::scene::ISceneNode::setScale().
 	*/
 	if (node)
-	{
-		node->setMaterialFlag(EMF_LIGHTING, false);
-		node->setMD2Animation(scene::EMAT_STAND);
-		//node->setMaterialTexture( 0, driver->getTexture("./media/sydney.bmp") );
-	}
+		node->setPosition(core::vector3df(-1300,-144,-1249));
 
 	/*
-	To look at the mesh, we place a camera into 3d space at the position
-	(0, 30, -40). The camera looks from there to (0,5,0), which is
-	approximately the place where our md2 model is.
+	Now we only need a camera to look at the Quake 3 map.
+	We want to create a user controlled camera. There are some
+	cameras available in the Irrlicht engine. For example the
+	MayaCamera which can be controlled like the camera in Maya:
+	Rotate with left mouse button pressed, Zoom with both buttons pressed,
+	translate with right mouse button pressed. This could be created with
+	irr::scene::ISceneManager::addCameraSceneNodeMaya(). But for this
+	example, we want to create a camera which behaves like the ones in
+	first person shooter games (FPS) and hence use
+	irr::scene::ISceneManager::addCameraSceneNodeFPS().
 	*/
-	smgr->addCameraSceneNode(0, vector3df(0,30,-40), vector3df(0,5,0));
+	smgr->addCameraSceneNodeFPS();
 
 	/*
-	Ok, now we have set up the scene, lets draw everything: We run the
-	device in a while() loop, until the device does not want to run any
-	more. This would be when the user closes the window or presses ALT+F4
-	(or whatever keycode closes a window).
+	The mouse cursor needs not be visible, so we hide it via the
+	irr::IrrlichtDevice::ICursorControl.
 	*/
+	device->getCursorControl()->setVisible(false);
+
+	/*
+	We have done everything, so lets draw it. We also write the current
+	frames per second and the primitives drawn into the caption of the
+	window. The test for irr::IrrlichtDevice::isWindowActive() is optional,
+	but prevents the engine to grab the mouse cursor after task switching
+	when other programs are active. The call to
+	irr::IrrlichtDevice::yield() will avoid the busy loop to eat up all CPU
+	cycles when the window is not active.
+	*/
+	int lastFPS = -1;
+
 	while(device->run())
 	{
-		/*
-		Anything can be drawn between a beginScene() and an endScene()
-		call. The beginScene() call clears the screen with a color and
-		the depth buffer, if desired. Then we let the Scene Manager and
-		the GUI Environment draw their content. With the endScene()
-		call everything is presented on the screen.
-		*/
-		driver->beginScene(true, true, SColor(255,100,101,140));
+		if (device->isWindowActive())
+		{
+			driver->beginScene(true, true, video::SColor(255,200,200,200));
+			smgr->drawAll();
+			driver->endScene();
 
-		smgr->drawAll();
-		guienv->drawAll();
+			int fps = driver->getFPS();
 
-		driver->endScene();
+			if (lastFPS != fps)
+			{
+				core::stringw str = L"Irrlicht Engine - Quake 3 Map example [";
+				str += driver->getName();
+				str += "] FPS:";
+				str += fps;
+
+				device->setWindowCaption(str.c_str());
+				lastFPS = fps;
+			}
+		}
+		else
+			device->yield();
 	}
 
 	/*
-	After we are done with the render loop, we have to delete the Irrlicht
-	Device created before with createDevice(). In the Irrlicht Engine, you
-	have to delete all objects you created with a method or function which
-	starts with 'create'. The object is simply deleted by calling ->drop().
-	See the documentation at irr::IReferenceCounted::drop() for more
-	information.
+	In the end, delete the Irrlicht device.
 	*/
 	device->drop();
-
 	return 0;
 }
+
+/*
+That's it. Compile and play around with the program.
+**/
