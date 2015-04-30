@@ -15,16 +15,8 @@ console.
 #include <irrlicht.h>
 #include <iostream>
 
-/*
-As already written in the HelloWorld example, in the Irrlicht Engine everything
-can be found in the namespace 'irr'. To get rid of the irr:: in front of the
-name of every class, we tell the compiler that we use that namespace from now
-on, and we will not have to write that 'irr::'. There are 5 other sub
-namespaces 'core', 'scene', 'video', 'io' and 'gui'. Unlike in the HelloWorld
-example, we do not call 'using namespace' for these 5 other namespaces, because
-in this way you will see what can be found in which namespace. But if you like,
-you can also include the namespaces like in the previous example.
-*/
+#include "W_EventReceiver.h"
+
 using namespace irr;
 
 /*
@@ -41,16 +33,6 @@ Ok, lets start. Again, we use the main() method as start, not the WinMain().
 */
 int main()
 {
-	/*
-	Like in the HelloWorld example, we create an IrrlichtDevice with
-	createDevice(). The difference now is that we ask the user to select
-	which video driver to use. The Software device might be
-	too slow to draw a huge Quake 3 map, but just for the fun of it, we make
-	this decision possible, too.
-	Instead of copying this whole code into your app, you can simply include
-	driverChoice.h from Irrlicht's include directory. The function
-	driverChoiceConsole does exactly the same.
-	*/
 
 	// ask user for driver
 
@@ -75,19 +57,15 @@ int main()
 		default: return 1;
 	}
 
-	// create device and exit if creation failed
+
+	W_EventReceiver receiver;
 
 	IrrlichtDevice *device =
-		createDevice(driverType, core::dimension2d<u32>(800, 600));
+	  createDevice(driverType, core::dimension2d<u32>(800, 600), 32, false, false, false, &receiver);
 
 	if (device == 0)
 		return 1; // could not create selected driver.
 
-	/*
-	Get a pointer to the video driver and the SceneManager so that
-	we do not always have to call irr::IrrlichtDevice::getVideoDriver() and
-	irr::IrrlichtDevice::getSceneManager().
-	*/
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 
@@ -124,83 +102,48 @@ int main()
 	scene::ISceneNode* node = 0;
 
 	if (mesh)
-		node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
-//		node = smgr->addMeshSceneNode(mesh->getMesh(0));
+	  node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
+
 
 	/*
-	Because the level was not modelled around the origin (0,0,0), we
-	translate the whole level a little bit. This is done on
-	irr::scene::ISceneNode level using the methods
-	irr::scene::ISceneNode::setPosition() (in this case),
-	irr::scene::ISceneNode::setRotation(), and
-	irr::scene::ISceneNode::setScale().
-	*/
 	if (node)
-		node->setPosition(core::vector3df(-1300,-144,-1249));
-
-	/*
-	Now we only need a camera to look at the Quake 3 map.
-	We want to create a user controlled camera. There are some
-	cameras available in the Irrlicht engine. For example the
-	MayaCamera which can be controlled like the camera in Maya:
-	Rotate with left mouse button pressed, Zoom with both buttons pressed,
-	translate with right mouse button pressed. This could be created with
-	irr::scene::ISceneManager::addCameraSceneNodeMaya(). But for this
-	example, we want to create a camera which behaves like the ones in
-	first person shooter games (FPS) and hence use
-	irr::scene::ISceneManager::addCameraSceneNodeFPS().
+	node->setPosition(core::vector3df(-1300,-144,-1249));
 	*/
-	smgr->addCameraSceneNodeFPS();
 
-	/*
-	The mouse cursor needs not be visible, so we hide it via the
-	irr::IrrlichtDevice::ICursorControl.
-	*/
+	// add the camera (FPS-like)
+	scene::ISceneNode * camera = smgr->addCameraSceneNodeFPS();
+	core::vector3df cameraPosition = camera->getPosition();
+	// hide the cursor
 	device->getCursorControl()->setVisible(false);
 
-	/*
-	We have done everything, so lets draw it. We also write the current
-	frames per second and the primitives drawn into the caption of the
-	window. The test for irr::IrrlichtDevice::isWindowActive() is optional,
-	but prevents the engine to grab the mouse cursor after task switching
-	when other programs are active. The call to
-	irr::IrrlichtDevice::yield() will avoid the busy loop to eat up all CPU
-	cycles when the window is not active.
-	*/
-	int lastFPS = -1;
+	const f32 MOVEMENT_SPEED = 700.f;
+	u32 then = device -> getTimer() -> getTime();
 
 	while(device->run())
-	{
-		if (device->isWindowActive())
-		{
-			driver->beginScene(true, true, video::SColor(255,200,200,200));
-			smgr->drawAll();
-			driver->endScene();
+	  {
+	  const u32 now = device->getTimer()->getTime();
+	  const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
+	  then = now;
 
-			int fps = driver->getFPS();
+	  if(receiver.IsKeyDown(irr::KEY_KEY_W))
+            cameraPosition.Z += MOVEMENT_SPEED * frameDeltaTime;
+	  else if(receiver.IsKeyDown(irr::KEY_KEY_S))
+            cameraPosition.Z -= MOVEMENT_SPEED * frameDeltaTime;
 
-			if (lastFPS != fps)
-			{
-				core::stringw str = L"Irrlicht Engine - Quake 3 Map example [";
-				str += driver->getName();
-				str += "] FPS:";
-				str += fps;
+	  if(receiver.IsKeyDown(irr::KEY_KEY_A))
+            cameraPosition.X -= MOVEMENT_SPEED * frameDeltaTime;
+	  else if(receiver.IsKeyDown(irr::KEY_KEY_D))
+            cameraPosition.X += MOVEMENT_SPEED * frameDeltaTime;
 
-				device->setWindowCaption(str.c_str());
-				lastFPS = fps;
-			}
-		}
-		else
-			device->yield();
-	}
+	  node->setPosition(cameraPosition);
 
-	/*
-	In the end, delete the Irrlicht device.
-	*/
+	  driver->beginScene(true, true, video::SColor(255,200,200,200));
+	  smgr->drawAll();
+	  driver->endScene();
+
+	  
+	  }
+
 	device->drop();
 	return 0;
 }
-
-/*
-That's it. Compile and play around with the program.
-**/
