@@ -1,17 +1,4 @@
-/** Example 002 Quake3Map
 
-This Tutorial shows how to load a Quake 3 map into the engine, create a
-SceneNode for optimizing the speed of rendering, and how to create a user
-controlled camera.
-
-Please note that you should know the basics of the engine before starting this
-tutorial. Just take a short look at the first tutorial, if you haven't done
-this yet: http://irrlicht.sourceforge.net/tut001.html
-
-Lets start like the HelloWorld example: We include the irrlicht header files
-and an additional file to be able to ask the user for a driver type using the
-console.
-*/
 #include <irrlicht.h>
 #include <iostream>
 
@@ -19,131 +6,142 @@ console.
 
 using namespace irr;
 
-/*
-Again, to be able to use the Irrlicht.DLL file, we need to link with the
-Irrlicht.lib. We could set this option in the project settings, but to make it
-easy, we use a pragma comment lib:
-*/
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
-/*
-Ok, lets start. Again, we use the main() method as start, not the WinMain().
-*/
+enum
+{
+    // I use this ISceneNode ID to indicate a scene node that is
+    // not pickable by getSceneNodeAndCollisionPointFromRay()
+    ID_IsNotPickable = 0,
+
+    // I use this flag in ISceneNode IDs to indicate that the
+    // scene node can be picked by ray selection.
+    IDFlag_IsPickable = 1 << 0,
+
+    // I use this flag in ISceneNode IDs to indicate that the
+    // scene node can be highlighted.  In this example, the
+    // homonids can be highlighted, but the level mesh can't.
+    IDFlag_IsHighlightable = 1 << 1
+};
+
+
+
 int main()
 {
 
-	// ask user for driver
+  // ask user for driver  
+  video::E_DRIVER_TYPE driverType;
+  
+  printf("Please select the driver you want for this example:\n"	\
+	 " (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"	\
+	 " (d) Burning's Software Renderer\n (e) Software Renderer\n"	\
+	 " (f) NullDevice\n (otherKey) exit\n\n");
+  
+  char i;
+  std::cin >> i;
+  
+  switch(i)
+    {
+    case 'a': driverType = video::EDT_OPENGL;   break;
+    case 'b': driverType = video::EDT_DIRECT3D9;break;
+    case 'c': driverType = video::EDT_DIRECT3D8;break;
+    case 'd': driverType = video::EDT_BURNINGSVIDEO;break;
+    case 'e': driverType = video::EDT_SOFTWARE; break;
+    case 'f': driverType = video::EDT_NULL;     break;
+    default: return 1;
+    }
+  
+  
+  W_EventReceiver receiver;
+  
+  u32 width = 1240;
+  u32 height = 780;
+  u32 color_depth = 32;
+  bool fullscreen = true;
+  bool stencilbuffer = false;
+  bool vsync = false;
+  IrrlichtDevice *device =
+    createDevice(driverType, core::dimension2d<u32>(width, height), color_depth, fullscreen, stencilbuffer, vsync, &receiver);
+  
+  if (device == 0)
+    return 1; // could not create selected driver.
+  
+  video::IVideoDriver* driver = device->getVideoDriver();
+  scene::ISceneManager* smgr = device->getSceneManager();
 
-	video::E_DRIVER_TYPE driverType;
+  // load the map
+  device->getFileSystem() -> addFileArchive("./media/map-20kdm2.pk3");
+  scene::IAnimatedMesh* map_mesh = smgr -> getMesh("20kdm2.bsp");
+  scene::IMeshSceneNode* map_node = 0;
+  
+  if (map_mesh)
+    map_node = smgr -> addOctreeSceneNode(map_mesh -> getMesh(0), 0, IDFlag_IsPickable);
 
-	printf("Please select the driver you want for this example:\n"\
-		" (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"\
-		" (d) Burning's Software Renderer\n (e) Software Renderer\n"\
-		" (f) NullDevice\n (otherKey) exit\n\n");
+  scene::ITriangleSelector* selector = 0;
+  if (map_node)
+    {
+      map_node -> setPosition(core::vector3df(-1350,-130,-1400));
+      
+      selector = smgr -> createOctreeTriangleSelector(map_node -> getMesh(), map_node, 128);
+      map_node -> setTriangleSelector(selector);
+      // We're not done with this selector yet, so don't drop it.
+    }
 
-	char i;
-	std::cin >> i;
+  // add the camera (FPS-like)
+  scene::ICameraSceneNode * camera = smgr -> addCameraSceneNodeFPS(0, 100.0f, .3f, ID_IsNotPickable, 0, 0, true, 3.f);
+  core::vector3df cameraPosition = camera -> getPosition();
+  camera -> setPosition(core::vector3df(50,50,-60));
+  camera -> setTarget(core::vector3df(-70,30,-60));
 
-	switch(i)
+  // hide the cursor
+  device->getCursorControl() -> setVisible(false);
+
+  if (selector)
+    {
+      scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(selector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
+      selector->drop(); // As soon as we're done with the selector, drop it.
+      camera->addAnimator(anim);
+      anim->drop();  // And likewise, drop the animator when we're done referring to it.
+    }
+
+  
+    
+  
+  const f32 MOVEMENT_SPEED = 700.f;
+  u32 then = device -> getTimer() -> getTime();
+  
+  while(device -> run())
+    {
+      if (device -> isWindowActive() ) 
 	{
-		case 'a': driverType = video::EDT_OPENGL;   break;
-		case 'b': driverType = video::EDT_DIRECT3D9;break;
-		case 'c': driverType = video::EDT_DIRECT3D8;break;
-		case 'd': driverType = video::EDT_BURNINGSVIDEO;break;
-		case 'e': driverType = video::EDT_SOFTWARE; break;
-		case 'f': driverType = video::EDT_NULL;     break;
-		default: return 1;
-	}
-
-
-	W_EventReceiver receiver;
-
-	IrrlichtDevice *device =
-	  createDevice(driverType, core::dimension2d<u32>(800, 600), 32, false, false, false, &receiver);
-
-	if (device == 0)
-		return 1; // could not create selected driver.
-
-	video::IVideoDriver* driver = device->getVideoDriver();
-	scene::ISceneManager* smgr = device->getSceneManager();
-
-	/*
-	To display the Quake 3 map, we first need to load it. Quake 3 maps
-	are packed into .pk3 files which are nothing else than .zip files.
-	So we add the .pk3 file to our irr::io::IFileSystem. After it was added,
-	we are able to read from the files in that archive as if they are
-	directly stored on the disk.
-	*/
-	device->getFileSystem()->addFileArchive("./media/map-20kdm2.pk3");
-
-	/*
-	Now we can load the mesh by calling
-	irr::scene::ISceneManager::getMesh(). We get a pointer returned to an
-	irr::scene::IAnimatedMesh. As you might know, Quake 3 maps are not
-	really animated, they are only a huge chunk of static geometry with
-	some materials attached. Hence the IAnimatedMesh consists of only one
-	frame, so we get the "first frame" of the "animation", which is our
-	quake level and create an Octree scene node with it, using
-	irr::scene::ISceneManager::addOctreeSceneNode().
-	The Octree optimizes the scene a little bit, trying to draw only geometry
-	which is currently visible. An alternative to the Octree would be a
-	irr::scene::IMeshSceneNode, which would always draw the complete
-	geometry of the mesh, without optimization. Try it: Use
-	irr::scene::ISceneManager::addMeshSceneNode() instead of
-	addOctreeSceneNode() and compare the primitives drawn by the video
-	driver. (There is a irr::video::IVideoDriver::getPrimitiveCountDrawn()
-	method in the irr::video::IVideoDriver class). Note that this
-	optimization with the Octree is only useful when drawing huge meshes
-	consisting of lots of geometry.
-	*/
-	scene::IAnimatedMesh* mesh = smgr->getMesh("20kdm2.bsp");
-	scene::ISceneNode* node = 0;
-
-	if (mesh)
-	  node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
-
-
-	/*
-	if (node)
-	node->setPosition(core::vector3df(-1300,-144,-1249));
-	*/
-
-	// add the camera (FPS-like)
-	scene::ISceneNode * camera = smgr->addCameraSceneNodeFPS();
-	core::vector3df cameraPosition = camera->getPosition();
-	// hide the cursor
-	device->getCursorControl()->setVisible(false);
-
-	const f32 MOVEMENT_SPEED = 700.f;
-	u32 then = device -> getTimer() -> getTime();
-
-	while(device->run())
-	  {
-	  const u32 now = device->getTimer()->getTime();
+	  const u32 now = device -> getTimer() -> getTime();
 	  const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 	  then = now;
-
+	  /*
 	  if(receiver.IsKeyDown(irr::KEY_KEY_W))
-            cameraPosition.Z += MOVEMENT_SPEED * frameDeltaTime;
+	    cameraPosition.Z += MOVEMENT_SPEED * frameDeltaTime;
 	  else if(receiver.IsKeyDown(irr::KEY_KEY_S))
-            cameraPosition.Z -= MOVEMENT_SPEED * frameDeltaTime;
-
+	    cameraPosition.Z -= MOVEMENT_SPEED * frameDeltaTime;
+	  
 	  if(receiver.IsKeyDown(irr::KEY_KEY_A))
-            cameraPosition.X -= MOVEMENT_SPEED * frameDeltaTime;
+	    cameraPosition.X -= MOVEMENT_SPEED * frameDeltaTime;
 	  else if(receiver.IsKeyDown(irr::KEY_KEY_D))
-            cameraPosition.X += MOVEMENT_SPEED * frameDeltaTime;
-
-	  node->setPosition(cameraPosition);
-
+	    cameraPosition.X += MOVEMENT_SPEED * frameDeltaTime;
+	  
+	  camera -> setPosition(cameraPosition);
+	  */
 	  driver->beginScene(true, true, video::SColor(255,200,200,200));
 	  smgr->drawAll();
 	  driver->endScene();
-
 	  
-	  }
-
-	device->drop();
-	return 0;
+	  
+	}
+      else 
+	device -> yield();
+    }
+  
+  device -> drop();
+  return 0;
 }
