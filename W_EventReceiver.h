@@ -1,11 +1,10 @@
+#pragma once
 
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
 #include <irrlicht.h>
-
-#pragma once
 
 using namespace irr;
 

@@ -1,4 +1,3 @@
-
 #include "W_EventReceiver.h"
 
 bool W_EventReceiver::OnEvent(const SEvent& event)
