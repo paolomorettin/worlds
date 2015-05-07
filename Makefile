@@ -5,7 +5,7 @@
 # Name of the executable created (.exe will be added automatically if necessary)
 Target := Worlds
 # List of source files, separated by spaces
-Sources := main.cpp W_EventReceiver.cpp
+Sources := main.cpp W_EventReceiver.cpp W_LevelGenerator.cpp W_Structure.cpp
 # Path to Irrlicht directory, should contain include/ and lib/
 IrrlichtHome := ./irrlicht-1.8.1/
 # Path for the executable. Note that Irrlicht.dll should usually also be there for win32 systems
