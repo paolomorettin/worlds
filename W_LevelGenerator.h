@@ -8,17 +8,21 @@
 #include "W_Structure.h"
 
 using namespace irr;
+using namespace core;
 
 class W_LevelGenerator {
  public:
-  W_LevelGenerator(core::vector3d<int>);
+  W_LevelGenerator(vector3d<int>,int);
 
-  core::list<W_Structure> * getStructures();
-  core::vector3d<int> getSize();
+  list<W_Structure> * getStructures();
+  vector3d<int> getSize();
+  vector3d<int> getStart();
+  vector3d<int> getEnd();
 
  private:
-
- core::list<W_Structure> structures;
- core::vector3d<int> size;
+  list<W_Structure> structures;
+  vector3d<int> size;
+  vector3d<int> start;
+  vector3d<int> end;
 
 };
