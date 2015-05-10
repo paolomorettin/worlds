@@ -105,7 +105,7 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
 
 
@@ -120,17 +120,22 @@ int main()
   video::SColor bg_color = video::SColor(255,100,200,200);
 
 
-  // ask user for driver    
-  video::E_DRIVER_TYPE driverType;
-  printf("Please select the driver you want for this example:\n"	\
-	 " (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"	\
-	 " (d) Burning's Software Renderer\n (e) Software Renderer\n"	\
-	 " (f) NullDevice\n (otherKey) exit\n\n");
-  
-  char i;
-  std::cin >> i;
-  
-  switch(i)
+  video::E_DRIVER_TYPE driverType = video::EDT_COUNT;
+  char choice = 0;
+  if (argc > 1) {
+	  choice = argv[1][0];
+  }
+  else {
+	  // ask user for driver
+	  printf("Please select the driver you want for this example:\n"	\
+			 " (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"	\
+			 " (d) Burning's Software Renderer\n (e) Software Renderer\n"	\
+			 " (f) NullDevice\n (otherKey) exit\n\n");
+
+	  std::cin >> choice;
+  }
+
+  switch(choice)
     {
     case 'a': driverType = video::EDT_OPENGL; break;
     case 'b': driverType = video::EDT_DIRECT3D9; break;
@@ -138,7 +143,9 @@ int main()
     case 'd': driverType = video::EDT_BURNINGSVIDEO; break;
     case 'e': driverType = video::EDT_SOFTWARE; break;
     case 'f': driverType = video::EDT_NULL; break;
-    default : return 1;
+    default :
+		printf("Invalid driver.\n");
+		return 1;
     }
 
   IrrlichtDevice *device =
