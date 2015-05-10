@@ -21,20 +21,21 @@ enum
 };
 
 
+
      
 
 bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::ICameraSceneNode * camera) {
 
   scene::IMetaTriangleSelector * metaselector = smgr -> createMetaTriangleSelector();
 
-  int scale = 100;
+  float base = 100.0;
+  float modelsize = 2.0;
+
   core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
   W_LevelGenerator level = W_LevelGenerator(level_size,1000);
 
   core::list<W_Structure> * structures = level.getStructures();
-
-
-
+  
   // create the structures
   core::list<W_Structure>::Iterator iterator;
   for (iterator = structures -> begin(); iterator != structures -> end(); iterator++) {
@@ -46,8 +47,10 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
     scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),parent,IDFlag_IsPickable);
 
     //    map_node -> setPosition((scale/2 *size) + scale * position);
-    map_node -> setPosition((scale/2 *size) + scale * position);
-    map_node -> setScale(scale * size);
+    core::vector3df new_size = (base/modelsize) * size;
+    map_node -> setScale(new_size);
+    map_node -> setPosition(new_size  + (base * position));
+
 
     map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
 
@@ -81,28 +84,28 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
 
   // create start/end point
   vector3d<int> startcell = level.getStart();
-  vector3df sp = vector3df(startcell.X, startcell.Y, startcell.Z);
-  //  sp.X = 2; sp.Y = 1000; sp.Z = 2;
-  /*
-  scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(2*scale);
+  vector3df sp = core::vector3df(base/2) + base * vector3df(startcell.X, startcell.Y, startcell.Z);
+  
+  scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(0.5 * base);
+
   start_node -> setID(ID_IsNotPickable);
-  start_node -> setPosition(scale * sp);*/
-  camera -> setPosition(scale * sp);
-  printf("Starting cell: (%i,%i,%i)\n",startcell.X,startcell.Y,startcell.Z);
-  vector3df camerapos = camera -> getPosition();
-  printf("Starting point: (%f,%f,%f)\n",camerapos.X,camerapos.Y,camerapos.Z);
+  start_node -> setPosition(sp);
+  camera -> setPosition(sp);
 
   vector3d<int> endcell = level.getEnd();
-  vector3df ep = vector3df(endcell.X, endcell.Y, endcell.Z);
-  scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(2*scale);  
-  end_node -> setPosition(scale * ep);
+  vector3df ep = core::vector3df(base/2) + base * vector3df(endcell.X, endcell.Y, endcell.Z);
   
+  scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(0.5*base);  
+
+  end_node -> setPosition(ep);
+
   scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
 
   camera->addAnimator(anim);
+  anim->drop();  
   
   metaselector -> drop();
-  anim->drop();  
+
 
   return true;
   
@@ -196,32 +199,29 @@ int main(int argc, char** argv)
   
   
   smgr -> setAmbientLight(video::SColor(100,1,1,50));
-
+    
   if (!createLevel(smgr,0,camera))
     return false;
-
+  
 
   scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 300.0f, ID_IsNotPickable ); 
-  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(10000,10000,10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-scene::ILightSceneNode* light3 = smgr -> addLightSceneNode( 0, core::vector3df(10000,-10000,10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-scene::ILightSceneNode* light4 = smgr -> addLightSceneNode( 0, core::vector3df(10000,10000,-10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-scene::ILightSceneNode* light5 = smgr -> addLightSceneNode( 0, core::vector3df(10000,-10000,-10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
+  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(100,100,100), video::SColor(255,255,255,255), 500.0f, ID_IsNotPickable ); 
 
 
 
-/*
-  //  LIGHT TEST
- int scale = 5;
+  /*
+  // TESTS
+ int scale = 1;
   scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(2*scale,0,IDFlag_IsPickable);
   scene::IAnimatedMeshSceneNode * node2 = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),0,IDFlag_IsPickable);
-  node -> setPosition(core::vector3df(1.1*scale,0,0));
-  node2 -> setPosition(core::vector3df(-1.1*scale,0,0));
-  node2 -> setScale(core::vector3df(scale));
+  //node -> setPosition(core::vector3df(1.1*scale,0,0));
+  //node2 -> setPosition(core::vector3df(-1.1*scale,0,0));
+  //node2 -> setScale(core::vector3df(scale));
   node2->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
 
-  node -> setDebugDataVisible(scene::EDS_NORMALS);
-  node2 -> setDebugDataVisible(scene::EDS_NORMALS);
-*/
+  node -> setDebugDataVisible(scene::EDS_FULL);
+  node2 -> setDebugDataVisible(scene::EDS_FULL);
+  */
 
   // hide the cursor
   device->getCursorControl() -> setVisible(false);
