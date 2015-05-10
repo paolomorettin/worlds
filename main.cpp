@@ -91,8 +91,40 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
   vector3df ep = vector3df(endcell.X, endcell.Y, endcell.Z);
   scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(2*scale);  
   end_node -> setPosition(scale * ep);
+
   
-  scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
+    scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
+        "./media/terrain-heightmap.png",
+        0,                  // parent node
+        -1,                 // node id
+        core::vector3df(0.f, 0.f, 0.f),     // position
+        core::vector3df(0.f, 0.f, 0.f),     // rotation
+        core::vector3df(level_size.X/4, 20.4f, level_size.Z/4),  // scale
+        video::SColor ( 255, 255, 255, 255 ),   // vertexColor
+        5,                  // maxLOD
+        scene::ETPS_17,             // patchSize
+        4                   // smoothFactor
+        );
+
+    terrain->setMaterialFlag(video::EMF_LIGHTING, false);
+
+    terrain->setMaterialTexture(0,
+            smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
+    terrain->setMaterialTexture(1,smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
+    
+    terrain->setMaterialType(video::EMT_DETAIL_MAP);
+
+    terrain->scaleTexture(1.0f, 20.0f);
+
+  
+      // create triangle selector for the terrain 
+    scene::ITriangleSelector* selector2
+        = smgr->createTerrainTriangleSelector(terrain, 0);
+    terrain->setTriangleSelector(selector2);
+	metaselector->addTriangleSelector(selector2);
+
+	
+	scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
 
   camera->addAnimator(anim);
   
@@ -190,7 +222,8 @@ int main(int argc, char** argv)
   
   
   scene::ICameraSceneNode* camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, -1, keyMap, 10, true, 10);
-  
+  camera->setFarValue(20000);
+  camera->setNearValue(1);
   
   smgr -> setAmbientLight(video::SColor(100,1,1,50));
 
