@@ -21,11 +21,13 @@ enum
 };
 
 
+     
+
 bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::ICameraSceneNode * camera) {
 
   scene::IMetaTriangleSelector * metaselector = smgr -> createMetaTriangleSelector();
 
-  int scale = 150;
+  int scale = 100;
   core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
   W_LevelGenerator level = W_LevelGenerator(level_size,1000);
 
@@ -41,32 +43,34 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
     core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
     core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
 
-    scene::IMeshSceneNode* map_node = smgr -> addCubeSceneNode(1,parent,IDFlag_IsPickable);
+    scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),parent,IDFlag_IsPickable);
 
+    //    map_node -> setPosition((scale/2 *size) + scale * position);
     map_node -> setPosition((scale/2 *size) + scale * position);
     map_node -> setScale(scale * size);
+
+    map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+
 
     switch (rand() % 3) {
     case 0 :
     map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
-    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,100,100,255);
+    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,10,255);
     map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/blue.png") );
     break;
     case 1 :
       map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
-    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,100,100);
+    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,10,10);
     map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/red.png") );
     break;
     case 2 :
     map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
-    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,100,255,100);
+    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,255,10);
     map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/green.png") );
     break;
-
-
     }
-    map_node -> setMaterialFlag(video::EMF_LIGHTING, false);
-    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+    map_node -> setMaterialFlag(video::EMF_LIGHTING, true);
+    //    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
 
     scene::ITriangleSelector* selector = smgr -> createOctreeTriangleSelector(map_node -> getMesh(), map_node, 128);
     map_node -> setTriangleSelector(selector);
@@ -78,6 +82,7 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
   // create start/end point
   vector3d<int> startcell = level.getStart();
   vector3df sp = vector3df(startcell.X, startcell.Y, startcell.Z);
+  //  sp.X = 2; sp.Y = 1000; sp.Z = 2;
   /*
   scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(2*scale);
   start_node -> setID(ID_IsNotPickable);
@@ -117,7 +122,7 @@ int main(int argc, char** argv)
   bool fullscreen = true;
   bool stencilbuffer = false;
   bool vsync = false;
-  video::SColor bg_color = video::SColor(255,100,200,200);
+  video::SColor bg_color = video::SColor(255,50,50,50);
 
 
   video::E_DRIVER_TYPE driverType = video::EDT_COUNT;
@@ -159,8 +164,6 @@ int main(int argc, char** argv)
   scene::ISceneManager* smgr = device->getSceneManager();
     
   // add the camera (FPS-like)
-
-  //scene::ICameraSceneNode * camera = smgr -> addCameraSceneNodeFPS(0, 100.0f, .3f, ID_IsNotPickable, 0, 0, true, 3.f);
   SKeyMap keyMap[10];
   keyMap[0].Action = EKA_MOVE_FORWARD;
   keyMap[0].KeyCode = KEY_UP;
@@ -194,23 +197,31 @@ int main(int argc, char** argv)
   
   smgr -> setAmbientLight(video::SColor(100,1,1,50));
 
-  scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(0,-100,0), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-  
   if (!createLevel(smgr,0,camera))
     return false;
-  
 
-  /*
+
+  scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 300.0f, ID_IsNotPickable ); 
+  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(10000,10000,10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
+scene::ILightSceneNode* light3 = smgr -> addLightSceneNode( 0, core::vector3df(10000,-10000,10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
+scene::ILightSceneNode* light4 = smgr -> addLightSceneNode( 0, core::vector3df(10000,10000,-10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
+scene::ILightSceneNode* light5 = smgr -> addLightSceneNode( 0, core::vector3df(10000,-10000,-10000), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
+
+
+
+/*
   //  LIGHT TEST
-  scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(10,0,IDFlag_IsPickable);
-  node -> setPosition(core::vector3df(0,0,20));
-  node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/red.png") );
-  node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
-  node -> getMaterial(0).DiffuseColor = video::SColor(255,0,255,0);
-  //node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
-  node -> setMaterialFlag(video::EMF_LIGHTING,true);
-  */
+ int scale = 5;
+  scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(2*scale,0,IDFlag_IsPickable);
+  scene::IAnimatedMeshSceneNode * node2 = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),0,IDFlag_IsPickable);
+  node -> setPosition(core::vector3df(1.1*scale,0,0));
+  node2 -> setPosition(core::vector3df(-1.1*scale,0,0));
+  node2 -> setScale(core::vector3df(scale));
+  node2->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+
+  node -> setDebugDataVisible(scene::EDS_NORMALS);
+  node2 -> setDebugDataVisible(scene::EDS_NORMALS);
+*/
 
   // hide the cursor
   device->getCursorControl() -> setVisible(false);
