@@ -6,6 +6,7 @@
 #include "W_EventReceiver.h"
 #include "W_LevelGenerator.h"
 #include "W_Structure.h"
+#include "W_Timer.h"
 
 using namespace irr;
 
@@ -194,7 +195,6 @@ int main(int argc, char** argv)
   keyMap[9].Action = EKA_JUMP_UP;
   keyMap[9].KeyCode = KEY_SPACE;
   
-  
   scene::ICameraSceneNode* camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, -1, keyMap, 10, true, 10);
   
   
@@ -229,6 +229,12 @@ int main(int argc, char** argv)
   const f32 MOVEMENT_SPEED = 700.f;
   u32 then = device -> getTimer() -> getTime();
   
+  /*
+  // TESTING TIMER
+  W_Timer myTimer = W_Timer(device);
+  int previous = 0;
+  myTimer.start();
+  */
   while(device -> run())
     {
       if (device -> isWindowActive() ) 
@@ -236,19 +242,22 @@ int main(int argc, char** argv)
 	  const u32 now = device -> getTimer() -> getTime();
 	  const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 	  then = now;
+
 	  /*
-	  if(receiver.IsKeyDown(irr::KEY_KEY_W))
-	    cameraPosition.Z += MOVEMENT_SPEED * frameDeltaTime;
-	  else if(receiver.IsKeyDown(irr::KEY_KEY_S))
-	    cameraPosition.Z -= MOVEMENT_SPEED * frameDeltaTime;
-	  
-	  if(receiver.IsKeyDown(irr::KEY_KEY_A))
-	    cameraPosition.X -= MOVEMENT_SPEED * frameDeltaTime;
-	  else if(receiver.IsKeyDown(irr::KEY_KEY_D))
-	    cameraPosition.X += MOVEMENT_SPEED * frameDeltaTime;
-	  
-	  camera -> setPosition(cameraPosition);
+	  // TESTING TIMER
+	  if(receiver.IsKeyDown(irr::KEY_KEY_T)){
+	    if (myTimer.isPaused())
+	      myTimer.resume();
+	    else
+	      myTimer.pause();
+	  }
+	  int seconds = (myTimer.getTime() / 1000.f);
+	  if (seconds != previous)
+	    printf("Seconds: %i\n",seconds);
+	  previous = seconds;
 	  */
+	  
+
 	  driver->beginScene(true, true, bg_color);
 	  smgr->drawAll();
 	  driver->endScene();
