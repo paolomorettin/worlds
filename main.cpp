@@ -115,7 +115,7 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
     scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 300.0f, ID_General ); 
 
     // "God-ray" volumetric light
-    scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, -1,
+    scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, ID_General,
 									  32,                              // Subdivisions on U axis
 									  32,                              // Subdivisions on V axis
 									  video::SColor(0, 255, 50, 255), // foot color
@@ -243,9 +243,11 @@ int main(int argc, char** argv)
     if (device == 0)
 	return 1; // could not create selected driver.
   
-    video::IVideoDriver* driver = device->getVideoDriver();
-    scene::ISceneManager* smgr = device->getSceneManager();
-    scene::ISceneCollisionManager* cmgr = smgr->getSceneCollisionManager();
+    video::IVideoDriver* driver = device -> getVideoDriver();
+    gui::IGUIEnvironment* guienv = device -> getGUIEnvironment();
+    scene::ISceneManager* smgr = device -> getSceneManager();
+    scene::ISceneCollisionManager* cmgr = smgr -> getSceneCollisionManager();
+
     
     // add the camera (FPS-like)
     SKeyMap keyMap[10];
@@ -314,8 +316,17 @@ int main(int argc, char** argv)
   
     // TESTING TIMER
     W_Timer myTimer = W_Timer(device);
-  
+    int previous_sec = 0;
+    gui::IGUIStaticText* timer_text = guienv -> addStaticText(L"0.00", rect<s32>(10,10,260,50),false,false,0);
+    gui::IGUIFont* font = guienv->getFont("./media/bigfont.png"); 
+    timer_text -> setOverrideColor(video::SColor(255,255,255,255));
+    if (font){
+      timer_text -> setOverrideFont(font);
+      printf("HEYY!\n");
+    }
+    
     int game_state = 0;
+    
     while(device -> run())
 	{
 	    if (device -> isWindowActive() ) 
@@ -323,20 +334,6 @@ int main(int argc, char** argv)
 		    const u32 now = device -> getTimer() -> getTime();
 		    const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 		    then = now;
-
-		    /*
-		    // TESTING TIMER
-		    if(receiver.IsKeyDown(irr::KEY_KEY_T)){
-		    if (myTimer.isPaused())
-		    myTimer.resume();
-		    else
-		    myTimer.pause();
-		    }
-		    int seconds = (myTimer.getTime() / 1000.f);
-		    if (seconds != previous)
-		    printf("Seconds: %i\n",seconds);
-		    previous = seconds;
-		    */
 
 		    // RAY COLLISION (see tutorial 7)
 		    core::line3d<f32> ray;
@@ -362,8 +359,19 @@ int main(int argc, char** argv)
 
 		    driver->beginScene(true, true, bg_color);
 		    smgr->drawAll();
+		    guienv -> drawAll();
 		    driver->endScene();
-	  
+		    // only update fps display if fps changed
+		    int time = myTimer.getTime() / 10;
+		    if (previous_sec != time){
+		      core::stringw str = L"";     
+		      str += ((float)time)/100.0f;
+		      timer_text->setText(str.c_str());
+		      previous_sec = time;
+		    }
+
+		    
+		    
 		}
 	    else 
 		device -> yield();
