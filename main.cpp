@@ -6,6 +6,7 @@
 #include "W_EventReceiver.h"
 #include "W_LevelGenerator.h"
 #include "W_Structure.h"
+#include "W_Timer.h"
 
 using namespace irr;
 
@@ -13,93 +14,180 @@ using namespace irr;
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
-enum
-{
-    ID_IsNotPickable = 0,
-    IDFlag_IsPickable = 1 << 0,
-    IDFlag_IsHighlightable = 1 << 1
+enum {
+    ID_General = 0,
+    ID_StartEnd = 1,
+    ID_Start = 1 << 1,
+    ID_End = 1 << 2
 };
 
 
 bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::ICameraSceneNode * camera) {
 
-  scene::IMetaTriangleSelector * metaselector = smgr -> createMetaTriangleSelector();
+    scene::IMetaTriangleSelector * metaselector = smgr -> createMetaTriangleSelector();
 
-  int scale = 150;
-  core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
-  W_LevelGenerator level = W_LevelGenerator(level_size,1000);
+    float base = 100.0;
+    float modelsize = 2.0;
 
-  core::list<W_Structure> * structures = level.getStructures();
+    core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
+    W_LevelGenerator level = W_LevelGenerator(level_size,1000);
 
+    core::list<W_Structure> * structures = level.getStructures();
+    /*
+    // START / END COLLISION TESTS
+    core::list<W_Structure> * structures = new list<W_Structure>();
+    structures -> push_front( W_Structure(0,0,0,10,1,10) );
+    structures -> push_front( W_Structure(9,1,9,1,1,1) );
+    */
 
-
-  // create the structures
-  core::list<W_Structure>::Iterator iterator;
-  for (iterator = structures -> begin(); iterator != structures -> end(); iterator++) {
+  
+  
+    // create the structures
+    core::list<W_Structure>::Iterator iterator;
+    for (iterator = structures -> begin(); iterator != structures -> end(); iterator++) {
     
-    W_Structure current = *iterator;
-    core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
-    core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
+	W_Structure current = *iterator;
+	core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
+	core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
 
-    scene::IMeshSceneNode* map_node = smgr -> addCubeSceneNode(1,parent,IDFlag_IsPickable);
+	scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),parent,ID_General);
 
-    map_node -> setPosition((scale/2 *size) + scale * position);
-    map_node -> setScale(scale * size);
+	//    map_node -> setPosition((scale/2 *size) + scale * position);
+	core::vector3df new_size = (base/modelsize) * size;
+	map_node -> setScale(new_size);
+	map_node -> setPosition(new_size  + (base * position));
 
-    switch (rand() % 3) {
-    case 0 :
-    map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
-    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,100,100,255);
-    map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/blue.png") );
-    break;
-    case 1 :
-      map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
-    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,100,100);
-    map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/red.png") );
-    break;
-    case 2 :
-    map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
-    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,100,255,100);
-    map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/green.png") );
-    break;
 
+	map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+
+
+	switch (rand() % 3) {
+	case 0 :
+	    map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
+	    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,10,255);
+	    map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/blue.png") );
+	    break;
+	case 1 :
+	    map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
+	    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,10,10);
+	    map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/red.png") );
+	    break;
+	case 2 :
+	    map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
+	    map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,255,10);
+	    map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/green.png") );
+	    break;
+	}
+	map_node -> setMaterialFlag(video::EMF_LIGHTING, true);
+	//    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+
+	scene::ITriangleSelector* selector = smgr -> createOctreeTriangleSelector(map_node -> getMesh(), map_node, 128);
+	map_node -> setTriangleSelector(selector);
+	metaselector -> addTriangleSelector(selector);
+	selector->drop();
 
     }
-    map_node -> setMaterialFlag(video::EMF_LIGHTING, false);
-    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
 
-    scene::ITriangleSelector* selector = smgr -> createOctreeTriangleSelector(map_node -> getMesh(), map_node, 128);
-    map_node -> setTriangleSelector(selector);
-    metaselector -> addTriangleSelector(selector);
-    selector->drop();
-
-  }
-
-  // create start/end point
-  vector3d<int> startcell = level.getStart();
-  vector3df sp = vector3df(startcell.X, startcell.Y, startcell.Z);
-  /*
-  scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(2*scale);
-  start_node -> setID(ID_IsNotPickable);
-  start_node -> setPosition(scale * sp);*/
-  camera -> setPosition(scale * sp);
-  printf("Starting cell: (%i,%i,%i)\n",startcell.X,startcell.Y,startcell.Z);
-  vector3df camerapos = camera -> getPosition();
-  printf("Starting point: (%f,%f,%f)\n",camerapos.X,camerapos.Y,camerapos.Z);
-
-  vector3d<int> endcell = level.getEnd();
-  vector3df ep = vector3df(endcell.X, endcell.Y, endcell.Z);
-  scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(2*scale);  
-  end_node -> setPosition(scale * ep);
+    // create start/end point
+    vector3d<int> startcell = level.getStart();
+    vector3df sp = core::vector3df(base/2) + base * vector3df(startcell.X, startcell.Y, startcell.Z);
   
-  scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
+    scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(0.5 * base);
+    start_node -> getMaterial(0).DiffuseColor = video::SColor(100,0,255,0);
+    start_node -> getMaterial(0).AmbientColor = video::SColor(100,0,255,0);
+    start_node -> getMaterial(0).EmissiveColor = video::SColor(100,0,255,0);
+    start_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+    start_node -> setID(ID_Start | ID_StartEnd);
+    start_node -> setPosition(sp);
+    camera -> setPosition(sp);
 
-  camera->addAnimator(anim);
+    vector3d<int> endcell = level.getEnd();
+    vector3df ep = core::vector3df(base/2) + base * vector3df(endcell.X, endcell.Y, endcell.Z);
   
-  metaselector -> drop();
-  anim->drop();  
+    scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(0.5*base);  
+    end_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,100,255);
+    end_node -> getMaterial(0).AmbientColor = video::SColor(100,255,100,255);
+    end_node -> getMaterial(0).EmissiveColor = video::SColor(100,255,100,255);
+    end_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+    end_node -> setID(ID_End | ID_StartEnd);
+    end_node -> setPosition(ep);
 
-  return true;
+    scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 300.0f, ID_General ); 
+
+    // "God-ray" volumetric light
+    scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, -1,
+									  32,                              // Subdivisions on U axis
+									  32,                              // Subdivisions on V axis
+									  video::SColor(0, 255, 50, 255), // foot color
+									  video::SColor(0, 0, 0, 0));      // tail color
+
+    if (godray){
+	godray -> setScale(core::vector3df(300.0f, 10000.0f, 300.0f));
+	godray -> setPosition(ep);
+
+        // load textures for animation
+        core::array<video::ITexture*> textures;
+        for (s32 g=7; g > 0; --g){
+            core::stringc tmp;
+            tmp = "./media/portal";
+            tmp += g;
+            tmp += ".bmp";
+            video::ITexture* t = smgr -> getVideoDriver() -> getTexture( tmp.c_str() );
+            textures.push_back(t);
+        }
+
+        // create texture animator
+        scene::ISceneNodeAnimator* glow = smgr->createTextureAnimator(textures, 150);
+
+        // add the animator
+        godray->addAnimator(glow);
+
+        // drop the animator because it was created with a create() function
+        glow->drop();
+    }
+
+  
+    scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
+        "./media/terrain-heightmap.png",
+        0,                  // parent node
+        -1,                 // node id
+        core::vector3df(0.f, 0.f, 0.f),     // position
+        core::vector3df(0.f, 0.f, 0.f),     // rotation
+        core::vector3df(level_size.X/4, 20.4f, level_size.Z/4),  // scale
+        video::SColor ( 255, 255, 255, 255 ),   // vertexColor
+        5,                  // maxLOD
+        scene::ETPS_17,             // patchSize
+        4                   // smoothFactor
+        );
+
+    terrain->setMaterialFlag(video::EMF_LIGHTING, false);
+
+    terrain->setMaterialTexture(0,
+            smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
+    terrain->setMaterialTexture(1,smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
+    
+    terrain->setMaterialType(video::EMT_DETAIL_MAP);
+
+    terrain->scaleTexture(1.0f, 20.0f);
+
+  
+      // create triangle selector for the terrain 
+    scene::ITriangleSelector* selector2
+        = smgr->createTerrainTriangleSelector(terrain, 0);
+    terrain->setTriangleSelector(selector2);
+	metaselector->addTriangleSelector(selector2);
+
+	
+	scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
+
+	
+    camera->addAnimator(anim);
+    anim->drop();  
+  
+    metaselector -> drop();
+
+
+    return true;
   
   
 }
@@ -109,147 +197,178 @@ int main(int argc, char** argv)
 {
 
 
-  W_EventReceiver receiver;
+    W_EventReceiver receiver;
   
-  u32 width = 1240;
-  u32 height = 780;
-  u32 color_depth = 32;
-  bool fullscreen = true;
-  bool stencilbuffer = false;
-  bool vsync = false;
-  video::SColor bg_color = video::SColor(255,100,200,200);
+    u32 width = 1240;
+    u32 height = 780;
+    u32 color_depth = 32;
+    bool fullscreen = true;
+    bool stencilbuffer = false;
+    bool vsync = false;
+    video::SColor bg_color = video::SColor(255,50,50,50);
 
 
-  video::E_DRIVER_TYPE driverType = video::EDT_COUNT;
-  char choice = 0;
-  if (argc > 1) {
-	  choice = argv[1][0];
-  }
-  else {
-	  // ask user for driver
-	  printf("Please select the driver you want for this example:\n"	\
-			 " (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"	\
-			 " (d) Burning's Software Renderer\n (e) Software Renderer\n"	\
-			 " (f) NullDevice\n (otherKey) exit\n\n");
+    video::E_DRIVER_TYPE driverType = video::EDT_COUNT;
+    char choice = 0;
+    if (argc > 1) {
+	choice = argv[1][0];
+    }
+    else {
+	// ask user for driver
+	printf("Please select the driver you want for this example:\n"	\
+	       " (a) OpenGL 1.5\n (b) Direct3D 9.0c\n (c) Direct3D 8.1\n"	\
+	       " (d) Burning's Software Renderer\n (e) Software Renderer\n"	\
+	       " (f) NullDevice\n (otherKey) exit\n\n");
 
-	  std::cin >> choice;
-  }
-
-  switch(choice)
-    {
-    case 'a': driverType = video::EDT_OPENGL; break;
-    case 'b': driverType = video::EDT_DIRECT3D9; break;
-    case 'c': driverType = video::EDT_DIRECT3D8; break;
-    case 'd': driverType = video::EDT_BURNINGSVIDEO; break;
-    case 'e': driverType = video::EDT_SOFTWARE; break;
-    case 'f': driverType = video::EDT_NULL; break;
-    default :
-		printf("Invalid driver.\n");
-		return 1;
+	std::cin >> choice;
     }
 
-  IrrlichtDevice *device =
-    createDevice(driverType, core::dimension2d<u32>(width, height), color_depth, fullscreen, stencilbuffer, vsync, &receiver);
-
-  
-  if (device == 0)
-    return 1; // could not create selected driver.
-  
-  video::IVideoDriver* driver = device->getVideoDriver();
-  scene::ISceneManager* smgr = device->getSceneManager();
-    
-  // add the camera (FPS-like)
-
-  //scene::ICameraSceneNode * camera = smgr -> addCameraSceneNodeFPS(0, 100.0f, .3f, ID_IsNotPickable, 0, 0, true, 3.f);
-  SKeyMap keyMap[10];
-  keyMap[0].Action = EKA_MOVE_FORWARD;
-  keyMap[0].KeyCode = KEY_UP;
-  keyMap[1].Action = EKA_MOVE_FORWARD;
-  keyMap[1].KeyCode = KEY_KEY_W;
-  
-  keyMap[2].Action = EKA_MOVE_BACKWARD;
-  keyMap[2].KeyCode = KEY_DOWN;
-  keyMap[3].Action = EKA_MOVE_BACKWARD;
-  keyMap[3].KeyCode = KEY_KEY_S;
-  
-  keyMap[4].Action = EKA_STRAFE_LEFT;
-  keyMap[4].KeyCode = KEY_LEFT;
-  keyMap[5].Action = EKA_STRAFE_LEFT;
-  keyMap[5].KeyCode = KEY_KEY_A;
-  
-  keyMap[6].Action = EKA_STRAFE_RIGHT;
-  keyMap[6].KeyCode = KEY_RIGHT;
-  keyMap[7].Action = EKA_STRAFE_RIGHT;
-  keyMap[7].KeyCode = KEY_KEY_D;
-
-  keyMap[8].Action = EKA_CROUCH;
-  keyMap[8].KeyCode = KEY_SHIFT;
-
-  keyMap[9].Action = EKA_JUMP_UP;
-  keyMap[9].KeyCode = KEY_SPACE;
-  
-  
-  scene::ICameraSceneNode* camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, -1, keyMap, 10, true, 10);
-  
-  
-  smgr -> setAmbientLight(video::SColor(100,1,1,50));
-
-  scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(0,-100,0), video::SColor(255,255,255,255), 30.0f, ID_IsNotPickable ); 
-  
-  if (!createLevel(smgr,0,camera))
-    return false;
-  
-
-  /*
-  //  LIGHT TEST
-  scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(10,0,IDFlag_IsPickable);
-  node -> setPosition(core::vector3df(0,0,20));
-  node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/red.png") );
-  node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
-  node -> getMaterial(0).DiffuseColor = video::SColor(255,0,255,0);
-  //node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
-  node -> setMaterialFlag(video::EMF_LIGHTING,true);
-  */
-
-  // hide the cursor
-  device->getCursorControl() -> setVisible(false);
-  
-  const f32 MOVEMENT_SPEED = 700.f;
-  u32 then = device -> getTimer() -> getTime();
-  
-  while(device -> run())
-    {
-      if (device -> isWindowActive() ) 
+    switch(choice)
 	{
-	  const u32 now = device -> getTimer() -> getTime();
-	  const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
-	  then = now;
-	  /*
-	  if(receiver.IsKeyDown(irr::KEY_KEY_W))
-	    cameraPosition.Z += MOVEMENT_SPEED * frameDeltaTime;
-	  else if(receiver.IsKeyDown(irr::KEY_KEY_S))
-	    cameraPosition.Z -= MOVEMENT_SPEED * frameDeltaTime;
-	  
-	  if(receiver.IsKeyDown(irr::KEY_KEY_A))
-	    cameraPosition.X -= MOVEMENT_SPEED * frameDeltaTime;
-	  else if(receiver.IsKeyDown(irr::KEY_KEY_D))
-	    cameraPosition.X += MOVEMENT_SPEED * frameDeltaTime;
-	  
-	  camera -> setPosition(cameraPosition);
-	  */
-	  driver->beginScene(true, true, bg_color);
-	  smgr->drawAll();
-	  driver->endScene();
-	  
-	  //	  core::vector3df pos = light1 -> getAbsolutePosition();
-	  //printf("(%f,%f,%f)\n",pos.X,pos.Y,pos.Z);
-	  
+	case 'a': driverType = video::EDT_OPENGL; break;
+	case 'b': driverType = video::EDT_DIRECT3D9; break;
+	case 'c': driverType = video::EDT_DIRECT3D8; break;
+	case 'd': driverType = video::EDT_BURNINGSVIDEO; break;
+	case 'e': driverType = video::EDT_SOFTWARE; break;
+	case 'f': driverType = video::EDT_NULL; break;
+	default :
+	    printf("Invalid driver.\n");
+	    return 1;
 	}
-      else 
-	device -> yield();
-    }
+
+    IrrlichtDevice *device =
+	createDevice(driverType, core::dimension2d<u32>(width, height), color_depth, fullscreen, stencilbuffer, vsync, &receiver);
+
   
-  device -> drop();
-  return 0;
+    if (device == 0)
+	return 1; // could not create selected driver.
+  
+    video::IVideoDriver* driver = device->getVideoDriver();
+    scene::ISceneManager* smgr = device->getSceneManager();
+    scene::ISceneCollisionManager* cmgr = smgr->getSceneCollisionManager();
+    
+    // add the camera (FPS-like)
+    SKeyMap keyMap[10];
+    keyMap[0].Action = EKA_MOVE_FORWARD;
+    keyMap[0].KeyCode = KEY_UP;
+    keyMap[1].Action = EKA_MOVE_FORWARD;
+    keyMap[1].KeyCode = KEY_KEY_W;
+  
+    keyMap[2].Action = EKA_MOVE_BACKWARD;
+    keyMap[2].KeyCode = KEY_DOWN;
+    keyMap[3].Action = EKA_MOVE_BACKWARD;
+    keyMap[3].KeyCode = KEY_KEY_S;
+  
+    keyMap[4].Action = EKA_STRAFE_LEFT;
+    keyMap[4].KeyCode = KEY_LEFT;
+    keyMap[5].Action = EKA_STRAFE_LEFT;
+    keyMap[5].KeyCode = KEY_KEY_A;
+  
+    keyMap[6].Action = EKA_STRAFE_RIGHT;
+    keyMap[6].KeyCode = KEY_RIGHT;
+    keyMap[7].Action = EKA_STRAFE_RIGHT;
+    keyMap[7].KeyCode = KEY_KEY_D;
+
+    keyMap[8].Action = EKA_CROUCH;
+    keyMap[8].KeyCode = KEY_SHIFT;
+
+    keyMap[9].Action = EKA_JUMP_UP;
+    keyMap[9].KeyCode = KEY_SPACE;
+  
+    scene::ICameraSceneNode* camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 10, true, 10);
+  
+    camera->setFarValue(20000);
+    camera->setNearValue(1);
+
+    smgr -> setAmbientLight(video::SColor(100,1,1,50));
+    
+    if (!createLevel(smgr,0,camera))
+	return false;
+  
+
+    scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 10.0f, ID_General ); 
+    scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 500.0f, ID_General ); 
+
+
+
+    /*
+    // TESTS
+    int scale = 1;
+    scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(2*scale,0,ID_General);
+    scene::IAnimatedMeshSceneNode * node2 = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),0,ID_General);
+    //node -> setPosition(core::vector3df(1.1*scale,0,0));
+    //node2 -> setPosition(core::vector3df(-1.1*scale,0,0));
+    //node2 -> setScale(core::vector3df(scale));
+    node2->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+
+    node -> setDebugDataVisible(scene::EDS_FULL);
+    node2 -> setDebugDataVisible(scene::EDS_FULL);
+    */
+
+    // hide the cursor
+    device->getCursorControl() -> setVisible(false);
+  
+    const f32 MOVEMENT_SPEED = 700.f;
+    u32 then = device -> getTimer() -> getTime();
+  
+  
+    // TESTING TIMER
+    W_Timer myTimer = W_Timer(device);
+  
+    int game_state = 0;
+    while(device -> run())
+	{
+	    if (device -> isWindowActive() ) 
+		{
+		    const u32 now = device -> getTimer() -> getTime();
+		    const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
+		    then = now;
+
+		    /*
+		    // TESTING TIMER
+		    if(receiver.IsKeyDown(irr::KEY_KEY_T)){
+		    if (myTimer.isPaused())
+		    myTimer.resume();
+		    else
+		    myTimer.pause();
+		    }
+		    int seconds = (myTimer.getTime() / 1000.f);
+		    if (seconds != previous)
+		    printf("Seconds: %i\n",seconds);
+		    previous = seconds;
+		    */
+
+		    // RAY COLLISION (see tutorial 7)
+		    core::line3d<f32> ray;
+		    ray.start = camera->getPosition();
+		    ray.end = ray.start + (camera->getTarget() - ray.start).normalize() * 0.01f;
+
+		    scene::ISceneNode* collided = cmgr -> getSceneNodeFromRayBB(ray,ID_StartEnd);
+		    if (collided){
+
+			if ((collided -> getID() & ID_Start) && (game_state == 0)){
+			    printf("Collided with ID: %i\n",collided -> getID());
+			    game_state = 1;
+			    myTimer.start();
+			    printf("START!\n");
+			} else if ((collided -> getID() & ID_End) && (game_state == 1)){
+			    printf("Collided with ID: %i\n",collided -> getID());
+			    myTimer.pause();
+			    printf("DONE! Time: %i ms\n",myTimer.getTime());
+			    game_state = 2;
+			}
+		    }
+	  
+
+		    driver->beginScene(true, true, bg_color);
+		    smgr->drawAll();
+		    driver->endScene();
+	  
+		}
+	    else 
+		device -> yield();
+	}
+  
+    device -> drop();
+    return 0;
 }
