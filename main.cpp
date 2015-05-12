@@ -147,35 +147,35 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
     }
 
   
-    scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
-        "./media/terrain-heightmap.png",
-        0,                  // parent node
-        -1,                 // node id
-        core::vector3df(0.f, 0.f, 0.f),     // position
-        core::vector3df(0.f, 0.f, 0.f),     // rotation
-        core::vector3df(level_size.X/4, 20.4f, level_size.Z/4),  // scale
-        video::SColor ( 255, 255, 255, 255 ),   // vertexColor
-        5,                  // maxLOD
-        scene::ETPS_17,             // patchSize
-        4                   // smoothFactor
-        );
+    // scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
+    //     "./media/terrain-heightmap.png",
+    //     0,                  // parent node
+    //     -1,                 // node id
+    //     core::vector3df(0.f, 0.f, 0.f),     // position
+    //     core::vector3df(0.f, 0.f, 0.f),     // rotation
+    //     core::vector3df(level_size.X/4, 20.4f, level_size.Z/4),  // scale
+    //     video::SColor ( 255, 255, 255, 255 ),   // vertexColor
+    //     5,                  // maxLOD
+    //     scene::ETPS_17,             // patchSize
+    //     4                   // smoothFactor
+    //     );
 
-    terrain->setMaterialFlag(video::EMF_LIGHTING, false);
+    // terrain->setMaterialFlag(video::EMF_LIGHTING, false);
 
-    terrain->setMaterialTexture(0,
-            smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
-    terrain->setMaterialTexture(1,smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
+    // terrain->setMaterialTexture(0,
+    //         smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
+    // terrain->setMaterialTexture(1,smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
     
-    terrain->setMaterialType(video::EMT_DETAIL_MAP);
+    // terrain->setMaterialType(video::EMT_DETAIL_MAP);
 
-    terrain->scaleTexture(1.0f, 20.0f);
+    // terrain->scaleTexture(1.0f, 20.0f);
 
   
-      // create triangle selector for the terrain 
-    scene::ITriangleSelector* selector2
-        = smgr->createTerrainTriangleSelector(terrain, 0);
-    terrain->setTriangleSelector(selector2);
-	metaselector->addTriangleSelector(selector2);
+    //   // create triangle selector for the terrain 
+    // scene::ITriangleSelector* selector2
+    //     = smgr->createTerrainTriangleSelector(terrain, 0);
+    // terrain->setTriangleSelector(selector2);
+	// metaselector->addTriangleSelector(selector2);
 
 	
 	scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
