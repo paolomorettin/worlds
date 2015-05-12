@@ -16,9 +16,10 @@ using namespace irr;
 
 enum
 {
-    ID_IsNotPickable = 0,
-    IDFlag_IsPickable = 1 << 0,
-    IDFlag_IsHighlightable = 1 << 1
+  ID_General = 0,
+  ID_StartEnd = 1,
+  ID_Start = 1 << 1,
+  ID_End = 1 << 2
 };
 
 
@@ -36,6 +37,14 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
   W_LevelGenerator level = W_LevelGenerator(level_size,1000);
 
   core::list<W_Structure> * structures = level.getStructures();
+  /*
+  // START / END COLLISION TESTS
+  core::list<W_Structure> * structures = new list<W_Structure>();
+  structures -> push_front( W_Structure(0,0,0,10,1,10) );
+  structures -> push_front( W_Structure(9,1,9,1,1,1) );
+  */
+
+  
   
   // create the structures
   core::list<W_Structure>::Iterator iterator;
@@ -45,7 +54,7 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
     core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
     core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
 
-    scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),parent,IDFlag_IsPickable);
+    scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),parent,ID_General);
 
     //    map_node -> setPosition((scale/2 *size) + scale * position);
     core::vector3df new_size = (base/modelsize) * size;
@@ -88,8 +97,11 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
   vector3df sp = core::vector3df(base/2) + base * vector3df(startcell.X, startcell.Y, startcell.Z);
   
   scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(0.5 * base);
-
-  start_node -> setID(ID_IsNotPickable);
+  start_node -> getMaterial(0).DiffuseColor = video::SColor(100,0,255,0);
+  start_node -> getMaterial(0).AmbientColor = video::SColor(100,0,255,0);
+  start_node -> getMaterial(0).EmissiveColor = video::SColor(100,0,255,0);
+  start_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+  start_node -> setID(ID_Start | ID_StartEnd);
   start_node -> setPosition(sp);
   camera -> setPosition(sp);
 
@@ -97,7 +109,11 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
   vector3df ep = core::vector3df(base/2) + base * vector3df(endcell.X, endcell.Y, endcell.Z);
   
   scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(0.5*base);  
-
+  end_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,0,0);
+  end_node -> getMaterial(0).AmbientColor = video::SColor(100,255,0,0);
+  end_node -> getMaterial(0).EmissiveColor = video::SColor(100,255,0,0);
+  end_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+  end_node -> setID(ID_End | ID_StartEnd);
   end_node -> setPosition(ep);
 
   scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
@@ -166,6 +182,7 @@ int main(int argc, char** argv)
   
   video::IVideoDriver* driver = device->getVideoDriver();
   scene::ISceneManager* smgr = device->getSceneManager();
+  scene::ISceneCollisionManager* cmgr = smgr->getSceneCollisionManager();
     
   // add the camera (FPS-like)
   SKeyMap keyMap[10];
@@ -195,7 +212,7 @@ int main(int argc, char** argv)
   keyMap[9].Action = EKA_JUMP_UP;
   keyMap[9].KeyCode = KEY_SPACE;
   
-  scene::ICameraSceneNode* camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, -1, keyMap, 10, true, 10);
+  scene::ICameraSceneNode* camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 10, true, 10);
   
   
   smgr -> setAmbientLight(video::SColor(100,1,1,50));
@@ -204,16 +221,16 @@ int main(int argc, char** argv)
     return false;
   
 
-  scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 300.0f, ID_IsNotPickable ); 
-  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(100,100,100), video::SColor(255,255,255,255), 500.0f, ID_IsNotPickable ); 
+  scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 300.0f, ID_General ); 
+  scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(100,100,100), video::SColor(255,255,255,255), 500.0f, ID_General ); 
 
 
 
   /*
   // TESTS
  int scale = 1;
-  scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(2*scale,0,IDFlag_IsPickable);
-  scene::IAnimatedMeshSceneNode * node2 = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),0,IDFlag_IsPickable);
+  scene::IMeshSceneNode * node = smgr -> addCubeSceneNode(2*scale,0,ID_General);
+  scene::IAnimatedMeshSceneNode * node2 = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),0,ID_General);
   //node -> setPosition(core::vector3df(1.1*scale,0,0));
   //node2 -> setPosition(core::vector3df(-1.1*scale,0,0));
   //node2 -> setScale(core::vector3df(scale));
@@ -229,12 +246,11 @@ int main(int argc, char** argv)
   const f32 MOVEMENT_SPEED = 700.f;
   u32 then = device -> getTimer() -> getTime();
   
-  /*
+  
   // TESTING TIMER
   W_Timer myTimer = W_Timer(device);
-  int previous = 0;
-  myTimer.start();
-  */
+  
+  int game_state = 0;
   while(device -> run())
     {
       if (device -> isWindowActive() ) 
@@ -256,14 +272,32 @@ int main(int argc, char** argv)
 	    printf("Seconds: %i\n",seconds);
 	  previous = seconds;
 	  */
+
+	  // RAY COLLISION (see tutorial 7)
+	  core::line3d<f32> ray;
+	  ray.start = camera->getPosition();
+	  ray.end = ray.start + (camera->getTarget() - ray.start).normalize() * 0.01f;
+
+	  scene::ISceneNode* collided = cmgr -> getSceneNodeFromRayBB(ray,ID_StartEnd);
+	  if (collided){
+
+	    if ((collided -> getID() & ID_Start) && (game_state == 0)){
+	      printf("Collided with ID: %i\n",collided -> getID());
+	      game_state = 1;
+	      myTimer.start();
+	      printf("START!\n");
+	    } else if ((collided -> getID() & ID_End) && (game_state == 1)){
+	    printf("Collided with ID: %i\n",collided -> getID());
+	      myTimer.pause();
+	      printf("DONE! Time: %i ms\n",myTimer.getTime());
+	      game_state = 2;
+	    }
+	  }
 	  
 
 	  driver->beginScene(true, true, bg_color);
 	  smgr->drawAll();
 	  driver->endScene();
-	  
-	  //	  core::vector3df pos = light1 -> getAbsolutePosition();
-	  //printf("(%f,%f,%f)\n",pos.X,pos.Y,pos.Z);
 	  
 	}
       else 

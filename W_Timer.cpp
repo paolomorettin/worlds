@@ -14,12 +14,16 @@ void W_Timer::start(){
   span = device -> getTimer() -> getTime();
 }
 void W_Timer::pause(){
-  paused = true;
-  span = device -> getTimer() -> getTime() - span;
+  if (!paused){
+    paused = true;
+    span = device -> getTimer() -> getTime() - span;
+  }
 }
 void W_Timer::resume(){
-  paused = false;
-  span = device -> getTimer() -> getTime() - span;
+  if (paused){
+    paused = false;
+    span = device -> getTimer() -> getTime() - span;
+  }
 
 }
 int W_Timer::getTime(){
