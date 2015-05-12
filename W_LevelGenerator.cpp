@@ -79,7 +79,7 @@ W_LevelGenerator::W_LevelGenerator(vector3d<int> lvl_size, int elements ){
 	const int max_iterations = 10;
 	for (int i = 0; i < max_iterations; i++) {
 
-		while (!bitmap[p1.X][p1.Y][p1.Z] || !bitmap[p2.X][p2.Y][p2.Z] || p1 == p2 || bitmap[p1.X][p1.Y - 1][p1.Z]) {
+		while (!bitmap[p1.X][p1.Y][p1.Z] || !bitmap[p2.X][p2.Y][p2.Z] || p1 == p2 || bitmap[p1.X][p1.Y - 1][p1.Z] || bitmap[p2.X][p2.Y - 1][p2.Z]) {
 			p1.X = rand() % lvl_size.X;
 			p1.Y = 1 + rand() % (lvl_size.Y - 1);
 			p1.Z = rand() % lvl_size.Z;
