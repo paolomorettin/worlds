@@ -1,8 +1,6 @@
 #pragma once
 
-#include <irrlicht.h>
-
-using namespace irr;
+class GameLoop;
 
 class IGameObject{
 	//! Called each frame.
@@ -19,7 +17,7 @@ class IGameObject{
 	 * @param tick_progress: The time that passed from the last logic
 	 * tick, expressed as a range [0.0, 1.0).
 	 */
-	virtual void rendering_loop(scene::ISceneManager& mgr, float tick_progress) = 0;
+	virtual void rendering_loop(GameLoop& mgr, float tick_progress) = 0;
 
 
 	//! Called with a fixed rate of 100Hz
@@ -27,7 +25,7 @@ class IGameObject{
 	 * Here you should handle the logic, the network and all the
 	 * non-graphic-related tasks.
 	 */
-	virtual void logic_tick() = 0;
+	virtual void logic_tick(GameLoop& mgr) = 0;
 };
 
 
@@ -51,13 +49,13 @@ class InterpolatingSplitGameObject : public IGameObject{
 	}
 
 
-	void rendering_loop(scene::ISceneManager& mgr, float tick_progress) {
+	void rendering_loop(GameLoop& mgr, float tick_progress) {
 		curr_state.interpolate(prev_state, next_state, tick_progress);
 		renderer.render(mgr, curr_state);
 	}
 
 
-	void logic_tick() {
+	void logic_tick(GameLoop& mgr) {
 		prev_state.copy(next_state);
 		curr_state.copy(prev_state);
 		next_state.tick();
@@ -80,14 +78,14 @@ class IGameObjectState {
     }
 
 	//! Advances the state of this game object to the next "logical step"
-	virtual void tick() = 0;
+	virtual void tick(GameLoop& mgr) = 0;
 };
 
 
 template<typename State>
 class IGameObjectRenderer {
 	//! Renders a state using irrlich.
-	virtual void render(scene::ISceneManager& mgr, State& state) = 0;
+	virtual void render(GameLoop& mgr, State& state) = 0;
 };
 
 
