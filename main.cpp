@@ -7,6 +7,7 @@
 #include "W_LevelGenerator.h"
 #include "W_Structure.h"
 #include "W_Timer.h"
+#include "W_GameObject.h"
 
 using namespace irr;
 
