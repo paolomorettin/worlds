@@ -117,18 +117,18 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
 
     // "God-ray" volumetric light
     scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, ID_General,
-									  32,                              // Subdivisions on U axis
-									  32,                              // Subdivisions on V axis
-									  video::SColor(0, 255, 50, 255), // foot color
-									  video::SColor(0, 0, 0, 0));      // tail color
+									  32,                                // Subdivisions on U axis
+									  32,                                // Subdivisions on V axis
+									  video::SColor(0, 150, 20, 150),  // foot color
+									  video::SColor(0, 0, 0, 0)); // tail color
 
     if (godray){
-	godray -> setScale(core::vector3df(300.0f, 10000.0f, 300.0f));
-	godray -> setPosition(ep);
+		godray -> setScale(core::vector3df(300.0f, 10000.0f, 300.0f));
+		godray -> setPosition(ep);
 
         // load textures for animation
         core::array<video::ITexture*> textures;
-        for (s32 g=7; g > 0; --g){
+        for (s32 g=1; g < 8; g++){
             core::stringc tmp;
             tmp = "./media/portal";
             tmp += g;
@@ -138,7 +138,7 @@ bool createLevel(scene::ISceneManager * smgr,scene::ISceneNode * parent,scene::I
         }
 
         // create texture animator
-        scene::ISceneNodeAnimator* glow = smgr->createTextureAnimator(textures, 150);
+        scene::ISceneNodeAnimator* glow = smgr->createTextureAnimator(textures, 100);
 
         // add the animator
         godray->addAnimator(glow);
