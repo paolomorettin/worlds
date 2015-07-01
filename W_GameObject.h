@@ -3,6 +3,7 @@
 class GameLoop;
 
 class IGameObject{
+ public:
 	//! Called each frame.
 	/*!
 	 * Lets the GameObject add/change/remove its own ISceneNodes into
