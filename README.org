@@ -1,0 +1,16 @@
+Worlds
+
+* Compilation
+
+To compile run:
+: $ ./configure.py
+: $ make -j8
+
+
+
+* Running:
+
+Launch the game by running
+: $ ./bin/Worlds
+Note that it will not work if you launch it in any directory other
+than the root of the project (it requires some data files in ./media).
