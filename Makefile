@@ -4,12 +4,6 @@
 
 # Name of the executable created (.exe will be added automatically if necessary)
 Target := Worlds
-# List of source files, separated by spaces
-Sources := main.cpp W_EventReceiver.cpp\
-	W_LevelGenerator.cpp \
-	W_Structure.cpp \
-	W_Timer.cpp \
-	W_GameLoop.cpp
 # Path to Irrlicht directory, should contain include/ and lib/
 IrrlichtHome := ./irrlicht-1.8.1
 # Path for the executable. Note that Irrlicht.dll should usually also be there for win32 systems
@@ -19,7 +13,7 @@ BinPath = ./bin
 # preprocessor flags, e.g. defines and include paths
 USERCPPFLAGS = 
 # compiler flags such as optimization flags
-USERCXXFLAGS = -O3 -ffast-math -std=c++11
+USERCXXFLAGS = -O3 -ffast-math -std=c++11 -g -Wall -Wextra -pedantic -Wno-unused-parameter
 #USERCXXFLAGS = -g -Wall
 # linker flags such as additional libraries and link paths
 USERLDFLAGS =
@@ -28,11 +22,9 @@ USERLDFLAGS =
 #no changes necessary below this line
 ####
 
-Objects := $(Sources:.cpp=.o)
-
-CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
+CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include `pkg-config --cflags bullet` $(USERCPPFLAGS)
 CXXFLAGS = $(USERCXXFLAGS)
-LDFLAGS = $(USERLDFLAGS)
+LDFLAGS = $(USERLDFLAGS) `pkg-config --cflags --libs bullet`
 
 #default target is Linux
 all: all_linux
@@ -47,8 +39,11 @@ all: all_linux
 # all_win32: LDFLAGS += -lopengl32 -lm
 # static_win32: LDFLAGS += -lgdi32 -lwinspool -lcomdlg32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32 -lopengl32
 include makefile.config
+
 # name of the binary - only valid for targets which set SYSTEM
 DESTPATH = $(BinPath)/$(Target)$(SUF)
+# Should set CPPFLAGS, LDFLAGS, Sources
+Objects := $(Sources:.cpp=.o)
 
 %.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
