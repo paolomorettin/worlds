@@ -45,10 +45,10 @@ DESTPATH = $(BinPath)/$(Target)$(SUF)
 # Should set CPPFLAGS, LDFLAGS, Sources
 Objects := $(Sources:.cpp=.o)
 
-%.o: %.cpp
+%.o: %.cpp $(Headers)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-all_linux all_win32 static_win32: $(Objects)
+all_linux all_win32 static_win32: $(Objects) $(Headers)
 	@mkdir -p $(BinPath)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(Objects) -o $(DESTPATH) $(LDFLAGS)
 

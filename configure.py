@@ -51,16 +51,19 @@ def find_irrlicht_compile_flags():
 
 def obtain_sources_list(dirs_to_scan):
     from os import walk
-    full_list = []
+    full_list_sources = []
+    full_list_headers = []
 
     for dir in dirs_to_scan:
         print "Scanning '"+str(dir)+"' for sources...",
         _, _, filenames = next(walk(dir), (None, None, []))
         c_files = [fname for fname in filenames if fname.endswith(".cpp")]
-        full_list+=c_files
-        print "found",len(c_files),"files"
+        h_files = [fname for fname in filenames if fname.endswith(".h")]
+        full_list_sources+=c_files
+        full_list_headers+=h_files
+        print "   found",len(c_files)," source files and", len(h_files), "header files."
 
-    return full_list
+    return full_list_sources, full_list_headers
 
 
 
@@ -70,14 +73,16 @@ if __name__=="__main__":
     if cflags == None or ldflags==None:
         print "Error: Cannot find a a working irr config."
         exit(1)
-    sources = obtain_sources_list(sources_dirs)
+    sources, headers = obtain_sources_list(sources_dirs)
     print "Config:"
     print "LDFLAGS="+ldflags
     print "CPPFLAGS="+cflags
     print "Sources="+" ".join(sources)
+    print "Headers="+" ".join(headers)
     with open("makefile.config","w") as f:
         f.write("LDFLAGS="+ldflags+"\n")
         f.write("CPPFLAGS="+cflags+"\n")
         f.write("Sources="+" ".join(sources)+"\n")
+        f.write("Headers="+" ".join(headers)+"\n")
 
     print "Configure successful"

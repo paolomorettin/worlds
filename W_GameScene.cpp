@@ -216,12 +216,11 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     metaselector -> drop();
 
     return true;
-
-
 }
 
 void MainGameScene::rendering_loop(GameLoop&, float) {
 }
+
 void MainGameScene::logic_tick(GameLoop&) {
 }
 
