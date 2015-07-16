@@ -27,6 +27,9 @@ class IGameObject{
 	 * non-graphic-related tasks.
 	 */
 	virtual void logic_tick(GameLoop& mgr) = 0;
+
+	
+	virtual ~IGameObject() {};
 };
 
 
