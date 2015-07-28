@@ -25,7 +25,6 @@ class GameLoop {
     video::IVideoDriver* driver;
     gui::IGUIEnvironment* guienv;
     scene::ISceneManager* smgr;
-    scene::ISceneCollisionManager* cmgr;
     ITimer* timer;
 	IEventReceiver* evrecv;
 

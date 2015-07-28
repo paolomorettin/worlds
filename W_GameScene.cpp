@@ -1,5 +1,5 @@
 #include "W_GameScene.h"
-
+#include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include "W_LevelGenerator.h"
 
 // used in the camera initialization: wtf is the meaning of this?
@@ -16,40 +16,35 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 	scene::ISceneManager * smgr = gameloop.smgr; // TODO: initialize
 	scene::ISceneNode * parent = nullptr;
 
-	// add the camera (FPS-like)
-    SKeyMap keyMap[10];
-    keyMap[0].Action = EKA_MOVE_FORWARD;
-    keyMap[0].KeyCode = KEY_UP;
-    keyMap[1].Action = EKA_MOVE_FORWARD;
-    keyMap[1].KeyCode = KEY_KEY_W;
+	// // add the camera (FPS-like)
+    // SKeyMap keyMap[10];
+    // keyMap[0].Action = EKA_MOVE_FORWARD;
+    // keyMap[0].KeyCode = KEY_UP;
+    // keyMap[1].Action = EKA_MOVE_FORWARD;
+    // keyMap[1].KeyCode = KEY_KEY_W;
 
-    keyMap[2].Action = EKA_MOVE_BACKWARD;
-    keyMap[2].KeyCode = KEY_DOWN;
-    keyMap[3].Action = EKA_MOVE_BACKWARD;
-    keyMap[3].KeyCode = KEY_KEY_S;
+    // keyMap[2].Action = EKA_MOVE_BACKWARD;
+    // keyMap[2].KeyCode = KEY_DOWN;
+    // keyMap[3].Action = EKA_MOVE_BACKWARD;
+    // keyMap[3].KeyCode = KEY_KEY_S;
 
-    keyMap[4].Action = EKA_STRAFE_LEFT;
-    keyMap[4].KeyCode = KEY_LEFT;
-    keyMap[5].Action = EKA_STRAFE_LEFT;
-    keyMap[5].KeyCode = KEY_KEY_A;
+    // keyMap[4].Action = EKA_STRAFE_LEFT;
+    // keyMap[4].KeyCode = KEY_LEFT;
+    // keyMap[5].Action = EKA_STRAFE_LEFT;
+    // keyMap[5].KeyCode = KEY_KEY_A;
 
-    keyMap[6].Action = EKA_STRAFE_RIGHT;
-    keyMap[6].KeyCode = KEY_RIGHT;
-    keyMap[7].Action = EKA_STRAFE_RIGHT;
-    keyMap[7].KeyCode = KEY_KEY_D;
+    // keyMap[6].Action = EKA_STRAFE_RIGHT;
+    // keyMap[6].KeyCode = KEY_RIGHT;
+    // keyMap[7].Action = EKA_STRAFE_RIGHT;
+    // keyMap[7].KeyCode = KEY_KEY_D;
 
-    keyMap[8].Action = EKA_CROUCH;
-    keyMap[8].KeyCode = KEY_SHIFT;
+    // keyMap[8].Action = EKA_CROUCH;
+    // keyMap[8].KeyCode = KEY_SHIFT;
 
-    keyMap[9].Action = EKA_JUMP_UP;
-    keyMap[9].KeyCode = KEY_SPACE;
+    // keyMap[9].Action = EKA_JUMP_UP;
+    // keyMap[9].KeyCode = KEY_SPACE;
 
-    camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 10, true, 10);
-
-    camera->setFarValue(20000);
-    camera->setNearValue(1);
-
-    scene::IMetaTriangleSelector * metaselector = smgr -> createMetaTriangleSelector();
+    //camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 10, true, 10);
 
     float base = 100.0;
     float modelsize = 2.0;
@@ -105,12 +100,6 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		}
 		map_node -> setMaterialFlag(video::EMF_LIGHTING, true);
 		//    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
-
-		scene::ITriangleSelector* selector = smgr -> createOctreeTriangleSelector(map_node -> getMesh(), map_node, 128);
-		map_node -> setTriangleSelector(selector);
-		metaselector -> addTriangleSelector(selector);
-		selector->drop();
-
     }
 
     // create start/end point
@@ -124,7 +113,6 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     start_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
     start_node -> setID(ID_Start | ID_StartEnd);
     start_node -> setPosition(sp);
-    camera -> setPosition(sp);
 
     vector3d<int> endcell = level.getEnd();
     vector3df ep = core::vector3df(base/2) + base * vector3df(endcell.X, endcell.Y, endcell.Z);
@@ -172,7 +160,6 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     }
 
 
-    scene::ILightSceneNode* light1 = smgr -> addLightSceneNode( camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 100.0f, ID_General );
     scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 500.0f, ID_General );
 
 
@@ -207,13 +194,36 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 	// metaselector->addTriangleSelector(selector2);
 
 
-	scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(metaselector, camera, core::vector3df(30,50,30), core::vector3df(0,-10,0), core::vector3df(0,30,0));
+	{ // player obj test
+		playerObj = new PlayerGameObj();
+		playerObj->initialize(gameloop);
 
+		// from euler angles, other constructors should be preferred (I
+		// think)
+		btQuaternion init_rotation(btScalar(0),btScalar(0),btScalar(0));
+		// initial position of the rigid body.
+		btVector3 init_position(btScalar(sp.X), btScalar(sp.Y), btScalar(sp.Z));
+		// initialize the rigid body transform.
+		btTransform transform(init_rotation, init_position);
+		// set motion state. TODO: Find better way to do this
+		playerObj->setWorldTransform(transform);
 
-    camera->addAnimator(anim);
-    anim->drop();
+		// model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
+		
+		btCollisionShape* sphere = new btSphereShape(1);
 
-    metaselector -> drop();
+		// inertia vector.
+		btVector3 inertiavector(0.01,0.1,0.1);
+
+		// add the rigid body
+		// mass of 80 kg.
+		btRigidBody* test = new btRigidBody(1, playerObj, sphere, inertiavector);
+		gameloop.dynamicsWorld->addRigidBody(test);
+
+		// just as a test, start with some initial velocity
+		test->applyCentralImpulse(btVector3(1, 5, 1));
+
+	}
 
     return true;
 }
@@ -224,3 +234,22 @@ void MainGameScene::render(GameLoop&, float) {
 void MainGameScene::logic_tick(GameLoop&) {
 }
 
+
+
+void PlayerGameObj::logic_tick(GameLoop&) {
+	// logic tickling :D
+	// here you should handle the keyboard input...
+}
+
+void PlayerGameObj::render(GameLoop&, float) {
+	// all done by irr
+}
+
+void PlayerGameObj::initialize(GameLoop& loop) {
+    SKeyMap keyMap[1]; // sorry, currently disabled.
+	// I don't want irr to interfere with bullet positions by moving the graphics object and not the phyisics one.
+	this->camera = loop.smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 0, true, 10);
+    this->camera->setFarValue(20000);
+    this->camera->setNearValue(1);
+    this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 100.0f, ID_General);
+}

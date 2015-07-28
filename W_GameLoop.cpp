@@ -116,7 +116,6 @@ bool GameLoop::initialize_irrlicht() {
     this->guienv = device -> getGUIEnvironment();
     this->smgr = device -> getSceneManager();
 	this->timer = device -> getTimer();
-    this->cmgr = smgr -> getSceneCollisionManager();
 	return true;
 }
 

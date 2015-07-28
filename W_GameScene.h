@@ -4,10 +4,12 @@
 #include "W_GameLoop.h"
 #include "W_GameObject.h"
 
+class PlayerGameObj;
+
 class MainGameScene : public IGameObject {
  public:
 
-	scene::ICameraSceneNode* camera;
+	PlayerGameObj* playerObj;
 
 	virtual void render(GameLoop&, float);
 	virtual void logic_tick(GameLoop&);
@@ -17,4 +19,40 @@ class MainGameScene : public IGameObject {
 	virtual ~MainGameScene() {};
 };
 
+
+class PlayerGameObj: public IGameObject {
+	btVector3 position; // of the bounding sphere
+	scene::ICameraSceneNode* camera = nullptr; // irr camera
+	scene::ILightSceneNode* playerlight = nullptr; // irr light that follows the player.
+
+public:
+
+	explicit PlayerGameObj():
+		IGameObject("Player")
+	{
+		
+	}
+	// virtual (override of IGameObject)
+	// called by bullet
+	virtual void setWorldTransform(const btTransform& centerOfMassWorldTrans)
+	{
+		m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset;
+		btVector3 pos = m_graphicsWorldTrans.getOrigin();
+		camera->setPosition(core::vector3df(pos.x(), pos.y(), pos.z()));
+	}
+
+	virtual void render(GameLoop&, float);
+	virtual void initialize(GameLoop&);
+	virtual void logic_tick(GameLoop&);
+
+	virtual ~PlayerGameObj() {};
+};
+
+class StaticCube: public IGameObject {
+
+	virtual void render(GameLoop&, float);
+	virtual void logic_tick(GameLoop&);
+
+	virtual ~StaticCube() {};
+};
 #endif

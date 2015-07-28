@@ -31,7 +31,7 @@ int main() {
 
 		// inertia vector.
 		btVector3 inertiavector(0.01,0.1,0.1);
-		
+
 		// add the rigid body. mass is 1.
 		btRigidBody* test = new btRigidBody(1, motion_state, sphere, inertiavector);
 		dynamicsWorld->addRigidBody(test);
