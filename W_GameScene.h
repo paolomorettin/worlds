@@ -9,7 +9,7 @@ class PlayerGameObj;
 class MainGameScene : public IGameObject {
  public:
 
-	PlayerGameObj* playerObj;
+	PlayerGameObj* playerObj = nullptr;
 
 	virtual void render(GameLoop&, float);
 	virtual void logic_tick(GameLoop&);
@@ -22,13 +22,13 @@ class MainGameScene : public IGameObject {
 
 class PlayerGameObj: public IGameObject {
 	btVector3 position; // of the bounding sphere
-	scene::ICameraSceneNode* camera = nullptr; // irr camera
-	scene::ILightSceneNode* playerlight = nullptr; // irr light that follows the player.
+	scene::ICameraSceneNode* camera; // irr camera
+	scene::ILightSceneNode* playerlight; // irr light that follows the player.
 
 public:
 
 	explicit PlayerGameObj():
-		IGameObject("Player")
+		IGameObject("Player"), position(0,0,0), playerlight(nullptr), camera(nullptr)
 	{
 		
 	}

@@ -2,6 +2,7 @@
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include "W_LevelGenerator.h"
 
+#include <iostream>
 // used in the camera initialization: wtf is the meaning of this?
 // used also in collision detection for the start and end
 // TODO: CODE DUPLICATION! This is also in main.cpp
@@ -198,9 +199,10 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		playerObj = new PlayerGameObj();
 		playerObj->initialize(gameloop);
 
+		std::cout<<"START PLAYER POS:"<<sp.X<<","<<sp.Y<<","<<sp.Z<<","<<std::endl;
 		// from euler angles, other constructors should be preferred (I
 		// think)
-		btQuaternion init_rotation(btScalar(0),btScalar(0),btScalar(0));
+		btQuaternion init_rotation(btScalar(0.01),btScalar(0.01),btScalar(0.01));
 		// initial position of the rigid body.
 		btVector3 init_position(btScalar(sp.X), btScalar(sp.Y), btScalar(sp.Z));
 		// initialize the rigid body transform.
@@ -209,20 +211,19 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		playerObj->setWorldTransform(transform);
 
 		// model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
-		
 		btCollisionShape* sphere = new btSphereShape(1);
 
 		// inertia vector.
-		btVector3 inertiavector(0.01,0.1,0.1);
+		btVector3 inertiavector(0.1,0.1,0.1);
 
 		// add the rigid body
 		// mass of 80 kg.
+
 		btRigidBody* test = new btRigidBody(1, playerObj, sphere, inertiavector);
 		gameloop.dynamicsWorld->addRigidBody(test);
 
 		// just as a test, start with some initial velocity
 		test->applyCentralImpulse(btVector3(1, 5, 1));
-
 	}
 
     return true;

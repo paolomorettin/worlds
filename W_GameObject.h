@@ -14,7 +14,10 @@ class IGameObject : public btMotionState{
 	std::string name;
 
 	explicit IGameObject(std::string name = std::string("[unknown]"))
-		: name(name), m_graphicsWorldTrans(), m_centerOfMassOffset(), m_startWorldTrans()
+		: btMotionState(), name(name),
+		  m_graphicsWorldTrans(btTransform::getIdentity()),
+		  m_centerOfMassOffset(btTransform::getIdentity()),
+		  m_startWorldTrans(btTransform::getIdentity())
 	{
 	}
 
