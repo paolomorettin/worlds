@@ -29,7 +29,7 @@ void GameLoop::start_loop() {
 			// - 2nd parameter is the max number of internal substeps.
 			// - 3rt parameter is the number of physics steps to perform (in Hz).
 			// Note that in the intermediate steps the movement is interpolated.
-			const int steps = dynamicsWorld->stepSimulation(now/1000.f, 5, 60);
+			const int steps = dynamicsWorld->stepSimulation(now/1000.f, 5, 1/60.0);
 			// TODO: does it really return the number of steps?
 
 			// manual callbacks of "logic_tick" function for each
