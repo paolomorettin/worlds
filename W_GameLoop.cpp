@@ -1,32 +1,85 @@
 #include "W_GameLoop.h"
+#include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
+
+// for debug
+#include <iostream>
+
+// a bit crude, but works.
+#define PRINTVEC(vec) vec.x()<<","<<vec.y()<<","<<vec.z()
+
+
 
 void GameLoop::start_loop() {
-	u32 last_logic_tick = timer->getTime();
+	u32 last_frame_time = timer->getTime();
 	while(device -> run()) {
 		if (device -> isWindowActive() ) {
 			const u32 now = timer->getTime();
-			int countlimit = 5; // max 5 logic ticks per frame.
-			while ((countlimit-- > 0) || (now - last_logic_tick >= 10)) {
-				last_logic_tick += 10;
-				for (std::shared_ptr<IGameObject>& obj : game_objects) {
-					obj->logic_tick(*this);
+			u32 advancement = now - last_frame_time;
+			last_frame_time = now;
+			// don't update more than 1 second. It would be useless at
+			// best.  This may happen in some strange situations
+			// (Linux CTRL+Z, putting computer in standby, etc...),
+			// and in these cases it's better to continue as if
+			// nothing happened instead of handling HUGE numbers later
+			// on.
+			advancement = advancement > 1000? 1000: advancement;
+
+			// Physics steps:
+			// - 1st parameter is the advancement in time (in seconds).
+			// - 2nd parameter is the max number of internal substeps.
+			// - 3rt parameter is the number of physics steps to perform (in Hz).
+			// Note that in the intermediate steps the movement is interpolated.
+			const int steps = dynamicsWorld->stepSimulation(now/1000.f, 5, 60);
+			// TODO: does it really return the number of steps?
+
+			// manual callbacks of "logic_tick" function for each
+			// object.
+			for(int i = 0; i < steps; i++) {
+				btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
+				for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
+					btRigidBody* body = ((btRigidBody*)objs[j]);
+					// MY objects have a logic tick callback.
+					IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
+					if(myobj) {
+						myobj->logic_tick(*this);
+					}
 				}
 			}
-			if (now - last_logic_tick >= 1000) {
-				// We are behind for more than 1 second! Don't
-				// try to catch up the lost ticks otherwise it
-				// will be too slow.
-				last_logic_tick = now;
+
+			{ // FIXME: Debug print of all objects...
+				btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
+				for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
+					btRigidBody* body = ((btRigidBody*)objs[j]);
+
+					const btVector3& position = body->getCenterOfMassPosition();
+					const btVector3& linearvelocity = body->getLinearVelocity();
+					const btVector3& angualrvelocity = body->getAngularVelocity();
+					btMotionState* mstate = body->getMotionState();
+					std::string itemname;
+					IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
+					if(myobj) {
+						itemname = myobj->name;
+					}
+					if (itemname == std::string()) {
+						itemname = "[Not an IGameObject]";
+					}
+					std::cout<<" - '"<<itemname<<"'"<<std::endl;
+					std::cout<<"    - pos   : "<<PRINTVEC(position) << std::endl;
+					std::cout<<"    - linvel: "<<PRINTVEC(linearvelocity) << std::endl;
+					std::cout<<"    - angvel: "<<PRINTVEC(angualrvelocity) << std::endl;
+
+				}
 			}
 
 			video::SColor bg_color = video::SColor(255,50,50,50);
 			driver->beginScene(true, true, bg_color);
 			for (std::shared_ptr<IGameObject>& obj : game_objects) {
-				obj->rendering_loop(*this, (now - last_logic_tick)/10.0);
+				obj->render(*this, advancement);
 			}
 			smgr -> drawAll();
 			guienv -> drawAll();
 			driver->endScene();
+			
 		}
 		else {
 			device -> yield();
@@ -68,3 +121,12 @@ bool GameLoop::initialize_irrlicht() {
 }
 
 
+
+bool GameLoop::initialize_bullet() {
+	this->config = new btDefaultCollisionConfiguration();
+	this->dispatcher = new btCollisionDispatcher(config);
+	this->overlappingpaircache = new btDbvtBroadphase();
+	this->solver = new btSequentialImpulseConstraintSolver();
+	this->dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingpaircache, solver, config);
+
+}

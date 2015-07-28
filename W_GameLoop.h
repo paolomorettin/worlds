@@ -9,6 +9,12 @@
 
 #include "W_GameObject.h"
 
+class btDefaultCollisionConfiguration;
+class btCollisionDispatcher;
+class btBroadphaseInterface;
+class btSequentialImpulseConstraintSolver;
+class btDiscreteDynamicsWorld;
+
 using namespace irr;
 
 class GameLoop {
@@ -23,7 +29,14 @@ class GameLoop {
     ITimer* timer;
 	IEventReceiver* evrecv;
 
+	btDefaultCollisionConfiguration* config;
+	btCollisionDispatcher* dispatcher;
+	btBroadphaseInterface* overlappingpaircache;
+	btSequentialImpulseConstraintSolver* solver;
+	btDiscreteDynamicsWorld* dynamicsWorld;
+
 	bool initialize_irrlicht(/* config manager */);
+	bool initialize_bullet(/* config manager */);
 	void start_loop();
 };
 

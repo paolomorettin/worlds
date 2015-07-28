@@ -9,7 +9,7 @@ class MainGameScene : public IGameObject {
 
 	scene::ICameraSceneNode* camera;
 
-	virtual void rendering_loop(GameLoop&, float);
+	virtual void render(GameLoop&, float);
 	virtual void logic_tick(GameLoop&);
 
     bool initialize(GameLoop& loop);

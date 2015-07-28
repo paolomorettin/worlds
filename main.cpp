@@ -40,6 +40,7 @@ int main(int argc, char** argv)
     video::SColor bg_color = video::SColor(255,50,50,50);
 
 	GameLoop loop;
+	loop.evrecv = &receiver;
 	loop.initialize_irrlicht();
 
     loop.smgr->setAmbientLight(video::SColor(100,1,1,50));

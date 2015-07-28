@@ -218,7 +218,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     return true;
 }
 
-void MainGameScene::rendering_loop(GameLoop&, float) {
+void MainGameScene::render(GameLoop&, float) {
 }
 
 void MainGameScene::logic_tick(GameLoop&) {
