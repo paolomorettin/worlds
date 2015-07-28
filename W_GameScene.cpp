@@ -223,7 +223,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		gameloop.dynamicsWorld->addRigidBody(test);
 
 		// just as a test, start with some initial velocity
-		test->applyCentralImpulse(btVector3(1, 5, 1));
+		test->applyCentralImpulse(btVector3(1, 200, 1));
 	}
 
     return true;
