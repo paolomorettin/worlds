@@ -1,6 +1,6 @@
-#include "W_GameLoop.h"
-#include "W_GameObject.h"
-#include "W_LevelGenerator.h"
+#include "GameLoop.hpp"
+#include "GameObject.hpp"
+#include "LevelGenerator.hpp"
 
 #include "Player.hpp"
 

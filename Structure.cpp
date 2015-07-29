@@ -1,7 +1,7 @@
 
-#include "W_Structure.h"
+#include "Structure.hpp"
 
-W_Structure::W_Structure(int pos_x, int pos_y, int pos_z, int size_x, int size_y, int size_z){
+Structure::Structure(int pos_x, int pos_y, int pos_z, int size_x, int size_y, int size_z){
 	this -> pos_x = pos_x;
 	this -> pos_y = pos_y;
 	this -> pos_z = pos_z;

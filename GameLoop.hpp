@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-#include "W_GameObject.h"
+#include "GameObject.hpp"
 
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;

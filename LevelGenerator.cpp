@@ -1,11 +1,11 @@
 
 #include <stdlib.h>
-#include "W_LevelGenerator.h"
+#include "LevelGenerator.hpp"
 
 
 
 
-W_LevelGenerator::W_LevelGenerator(vector3d<int> lvl_size, int elements ){
+LevelGenerator::LevelGenerator(vector3d<int> lvl_size, int elements ){
 	this -> size = lvl_size;
 
 	//core::vector3d<int> maxsize = core::vector3d<int>(size.X, size.Y, size.Z);
@@ -56,7 +56,7 @@ W_LevelGenerator::W_LevelGenerator(vector3d<int> lvl_size, int elements ){
 			break;
 
 		printf("Position: (%i,%i,%i) Size: (%i,%i,%i)\n",pos_x,pos_y,pos_z,size_x,size_y,size_z);
-		(this -> structures).push_front( W_Structure(pos_x,pos_y,pos_z,size_x,size_y,size_z) );
+		(this -> structures).push_front( Structure(pos_x,pos_y,pos_z,size_x,size_y,size_z) );
 
 		// update the skyline and the bitmap
 		for (int i=pos_x; i < pos_x + size_x; i++) {
@@ -99,7 +99,7 @@ W_LevelGenerator::W_LevelGenerator(vector3d<int> lvl_size, int elements ){
 
 
 // getters
-list<W_Structure> * W_LevelGenerator::getStructures(){ return &(this -> structures); }
-vector3d<int> W_LevelGenerator::getSize(){ return this -> size; }
-vector3d<int> W_LevelGenerator::getStart(){ return this -> start; }
-vector3d<int> W_LevelGenerator::getEnd(){ return this -> end; }
+list<Structure> * LevelGenerator::getStructures(){ return &(this -> structures); }
+vector3d<int> LevelGenerator::getSize(){ return this -> size; }
+vector3d<int> LevelGenerator::getStart(){ return this -> start; }
+vector3d<int> LevelGenerator::getEnd(){ return this -> end; }

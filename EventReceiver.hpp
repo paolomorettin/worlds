@@ -8,13 +8,13 @@
 
 using namespace irr;
 
-class W_EventReceiver : public IEventReceiver {
+class EventReceiver : public IEventReceiver {
  public:
 
 	virtual bool OnEvent(const SEvent& event);
 
 	virtual bool IsKeyDown(EKEY_CODE keyCode) const;
-	W_EventReceiver();
+	EventReceiver();
 
  private:
     // We use this array to store the current state of each key

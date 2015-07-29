@@ -3,12 +3,12 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "W_EventReceiver.h"
-#include "W_Structure.h"
-#include "W_Timer.h"
-#include "W_GameObject.h"
-#include "W_GameScene.h"
-#include "W_LevelGenerator.h"
+#include "EventReceiver.hpp"
+#include "Structure.hpp"
+#include "Timer.hpp"
+#include "GameObject.hpp"
+#include "GameScene.hpp"
+#include "LevelGenerator.hpp"
 
 using namespace irr;
 
@@ -19,7 +19,7 @@ using namespace irr;
 
 // used in the camera initialization: wtf is the meaning of this?
 // used also in collision detection for the start and end
-// TODO: CODE DUPLICATION! This is also in W_GameScene.cpp
+// TODO: CODE DUPLICATION! This is also in GameScene.cpp
 enum {
     ID_General = 0,
     ID_StartEnd = 1,
@@ -29,7 +29,7 @@ enum {
 
 int main(int argc, char** argv)
 {
-    W_EventReceiver receiver;
+    EventReceiver receiver;
 
     video::SColor bg_color = video::SColor(255,50,50,50);
 

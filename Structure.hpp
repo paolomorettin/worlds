@@ -1,9 +1,9 @@
 
 #pragma once
 
-class W_Structure {
+class Structure {
  public:
-	W_Structure(int,int,int,int,int,int);
+	Structure(int,int,int,int,int,int);
 	int pos_x;
 	int pos_y;
 	int pos_z;

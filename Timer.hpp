@@ -4,9 +4,9 @@
 #include <irrlicht.h>
 
 
-class W_Timer {
+class Timer {
  public :
-  W_Timer(irr::IrrlichtDevice*);
+  Timer(irr::IrrlichtDevice*);
   void start();
   void pause();
   void resume();

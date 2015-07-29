@@ -1,6 +1,6 @@
-#include "W_GameScene.h"
+#include "GameScene.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
-#include "W_LevelGenerator.h"
+#include "LevelGenerator.hpp"
 
 #include <iostream>
 // used in the camera initialization: wtf is the meaning of this?
@@ -14,12 +14,12 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 
 
     core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
-    W_LevelGenerator level = W_LevelGenerator(level_size,1000);
+    LevelGenerator level = LevelGenerator(level_size,1000);
 
-    core::list<W_Structure> * structures = level.getStructures();
+    core::list<Structure> * structures = level.getStructures();
 
     // create the structures
-    for (W_Structure& current: *structures) {
+    for (Structure& current: *structures) {
 		StaticStructure* structure = new StaticStructure();
 		current.size_x *= world_scale;
 		current.size_y *= world_scale;
@@ -180,7 +180,7 @@ void StaticStructure::logic_tick(GameLoop&) { }
 
 void StaticStructure::render(GameLoop&, float) { }
 
-btRigidBody* StaticStructure::initialize(GameLoop& loop, const W_Structure& current) {
+btRigidBody* StaticStructure::initialize(GameLoop& loop, const Structure& current) {
 
 	core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
 	core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);

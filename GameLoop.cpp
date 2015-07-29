@@ -1,4 +1,4 @@
-#include "W_GameLoop.h"
+#include "GameLoop.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 
 #define DEBUG_PHYSOBJECTS 0
