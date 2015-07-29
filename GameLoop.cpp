@@ -49,11 +49,6 @@ void GameLoop::start_loop() {
 			// TODO: does it really return the number of steps?
 
 
-			// manual callbacks of "logic_tick" function for each
-			// object.
-			for (IGameObject* obj: event_objs) {
-				obj->logic_tick(*this);
-			}
 
 #if DEBUG_PHYSOBJECTS
 			{ // FIXME: Debug print of all objects...
@@ -95,6 +90,15 @@ void GameLoop::start_loop() {
 	}
 }
 
+static void motor_post_tick_callback (btDynamicsWorld *world, btScalar timeStep)
+{
+    GameLoop *loop = static_cast<GameLoop *>(world->getWorldUserInfo());
+	// manual callbacks of "logic_tick" function for each
+	// object.
+	for (IGameObject* obj: loop->event_objs) {
+		obj->logic_tick(*loop);
+	}
+}
 
 bool GameLoop::initialize_irrlicht() {
   
@@ -136,5 +140,6 @@ bool GameLoop::initialize_bullet() {
 	this->solver = new btSequentialImpulseConstraintSolver();
 	this->dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingpaircache, solver, config);
 	this->dynamicsWorld->setGravity(this->dynamicsWorld->getGravity()/20);
-	this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());  
+	this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+	this->dynamicsWorld->setInternalTickCallback(motor_post_tick_callback,this,true);
 }

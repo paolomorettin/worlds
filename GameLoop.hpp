@@ -32,7 +32,9 @@ class GameLoop {
 	btBroadphaseInterface* overlappingpaircache;
 	btSequentialImpulseConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamicsWorld;
-    
+
+	std::vector<IGameObject*> event_objs;
+	
 	bool initialize_irrlicht(/* config manager */);
 	bool initialize_bullet(/* config manager */);
 	void start_loop();
@@ -40,8 +42,6 @@ class GameLoop {
     void attach(IGameObject* obj);
     void detach(IGameObject* obj);
 
- private:
-	std::vector<IGameObject*> event_objs;
 };
 
  

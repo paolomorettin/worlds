@@ -73,5 +73,21 @@ btGhostObject* LevelEndObj::initialize(GameLoop& loop, const irr::core::vector3d
 }
 
 void LevelEndObj::logic_tick(GameLoop&){
-	std::cout<<"Test"<<std::endl;
+	std::cout<<"End collides with "<<ghostObject->getNumOverlappingObjects()<<std::endl;
+	
+	for(int i = 0; i < ghostObject->getNumOverlappingObjects(); i++) {
+		btRigidBody *body = dynamic_cast<btRigidBody *>(ghostObject->getOverlappingObject(i));
+		// do whatever you want to do with these pairs of colliding objects
+		
+		btMotionState* mstate = body->getMotionState();
+		std::string itemname;
+		IGameObject* myobj = dynamic_cast<IGameObject*>(mstate);
+		if(myobj) {
+			itemname = myobj->name;
+		}
+		if (itemname == std::string()) {
+			itemname = "[Not an IGameObject]";
+		}
+		std::cout<<" - '"<<itemname<<"'"<<std::endl;
+	}
 }
