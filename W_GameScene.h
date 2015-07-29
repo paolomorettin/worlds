@@ -10,6 +10,8 @@ class PlayerGameObj;
 class MainGameScene : public IGameObject {
  public:
 
+	const float world_scale = 1; // affects structures
+	
 	PlayerGameObj* playerObj = nullptr;
 
 	virtual void render(GameLoop&, float);

@@ -53,14 +53,15 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 
     core::list<W_Structure> * structures = level.getStructures();
 
-
-    float base = 100.0;
-    float modelsize = 2.0;
-
-
     // create the structures
-    for (const W_Structure& current: *structures) {
+    for (W_Structure& current: *structures) {
 		StaticStructure* structure = new StaticStructure();
+		current.size_x *= world_scale;
+		current.size_y *= world_scale;
+		current.size_z *= world_scale;
+		current.pos_x *= world_scale;
+		current.pos_y *= world_scale;
+		current.pos_z *= world_scale;
 		btRigidBody* rigidb = structure->initialize(gameloop, current);
 		gameloop.dynamicsWorld->addRigidBody(rigidb);
 
@@ -68,9 +69,10 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 
     // create start/end point
     vector3d<int> startcell = level.getStart();
-    vector3df sp = core::vector3df(base/2) + base * vector3df(startcell.X, startcell.Y, startcell.Z);
-
-    scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(0.5 * base);
+    vector3df sp = core::vector3df(1.0/2) + vector3df(startcell.X, startcell.Y, startcell.Z);
+	sp *= world_scale;
+	
+    scene::IMeshSceneNode * start_node = smgr -> addSphereSceneNode(0.5);
     start_node -> getMaterial(0).DiffuseColor = video::SColor(100,0,255,0);
     start_node -> getMaterial(0).AmbientColor = video::SColor(100,0,255,0);
     start_node -> getMaterial(0).EmissiveColor = video::SColor(100,0,255,0);
@@ -79,9 +81,10 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     start_node -> setPosition(sp);
 
     vector3d<int> endcell = level.getEnd();
-    vector3df ep = core::vector3df(base/2) + base * vector3df(endcell.X, endcell.Y, endcell.Z);
+    vector3df ep = core::vector3df(1.0/2) + vector3df(endcell.X, endcell.Y, endcell.Z);
+	ep *= world_scale;
 
-    scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(0.5*base);
+    scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(0.5);
     end_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,100,255);
     end_node -> getMaterial(0).AmbientColor = video::SColor(100,255,100,255);
     end_node -> getMaterial(0).EmissiveColor = video::SColor(100,255,100,255);
@@ -89,7 +92,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     end_node -> setID(ID_End | ID_StartEnd);
     end_node -> setPosition(ep);
 
-    scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 300.0f, ID_General );
+    scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 10.0f, ID_General );
 
     // "God-ray" volumetric light
     scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, ID_General,
@@ -99,7 +102,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 																		  video::SColor(0, 0, 0, 0)); // tail color
 
     if (godray){
-		godray -> setScale(core::vector3df(300.0f, 10000.0f, 300.0f));
+		godray -> setScale(core::vector3df(3.0f, 1000.0f, 3.0f));
 		godray -> setPosition(ep);
 
         // load textures for animation
@@ -124,7 +127,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     }
 
 
-    scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 500.0f, ID_General );
+    scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 50.0f, ID_General );
 
 
     // scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
@@ -175,7 +178,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		playerObj->setWorldTransform(transform);
 
 		// model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
-		btCollisionShape* sphere = new btSphereShape(10);
+		btCollisionShape* sphere = new btSphereShape(0.2);
 
 		// inertia vector.
 		btVector3 inertiavector(0.1,0.1,0.1);
@@ -183,11 +186,11 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		// add the rigid body
 		// mass of 80 kg.
 
-		btRigidBody* test = new btRigidBody(1, playerObj, sphere, inertiavector);
+		btRigidBody* test = new btRigidBody(80, playerObj, sphere, inertiavector);
 		gameloop.dynamicsWorld->addRigidBody(test);
 
 		// just as a test, start with some initial velocity
-		test->applyCentralImpulse(btVector3(10, 200, 10));
+		test->applyCentralImpulse(btVector3(30, -200, 30));
 	}
 
     return true;
@@ -214,9 +217,9 @@ void PlayerGameObj::initialize(GameLoop& loop) {
     SKeyMap keyMap[1]; // sorry, currently disabled.
 	// I don't want irr to interfere with bullet positions by moving the graphics object and not the phyisics one.
 	this->camera = loop.smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 0, true, 10);
-    this->camera->setFarValue(20000);
-    this->camera->setNearValue(1);
-    this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 100.0f, ID_General);
+    this->camera->setFarValue(200);
+    this->camera->setNearValue(0.01);
+    this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 3.0f, ID_General);
 }
 
 
@@ -225,11 +228,9 @@ void StaticStructure::logic_tick(GameLoop&) { }
 void StaticStructure::render(GameLoop&, float) { }
 
 btRigidBody* StaticStructure::initialize(GameLoop& loop, const W_Structure& current) {
-	
-    float map_scale = 100.0;
-	
-	core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z) * map_scale;
-	core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z) * map_scale/2;
+
+	core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
+	core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
 
 	scene::IAnimatedMeshSceneNode* map_node = loop.smgr -> addAnimatedMeshSceneNode(loop.smgr -> getMesh("./media/cube.3ds"), nullptr, ID_General);
 	map_node -> setScale(size);
@@ -257,6 +258,9 @@ btRigidBody* StaticStructure::initialize(GameLoop& loop, const W_Structure& curr
 	map_node -> setMaterialFlag(video::EMF_LIGHTING, true);
 	//    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
 
+	//size /=2;
+	position += size/2;
+	size /=2;
 	btQuaternion init_rotation(btScalar(0),btScalar(0),btScalar(0));
 	// initial position of the rigid body.
 	btVector3 init_position(btScalar(position.X), btScalar(position.Y), btScalar(position.Z));

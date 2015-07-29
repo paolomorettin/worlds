@@ -1,6 +1,8 @@
 #include "W_GameLoop.h"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 
+#define DEBUG_PHYSOBJECTS 0
+
 // for debug
 #include <iostream>
 
@@ -11,6 +13,7 @@
 
 void GameLoop::start_loop() {
 	u32 last_frame_time = timer->getTime();
+	float time_scale = 1; // change for fun effects
 	while(device -> run()) {
 		if (device -> isWindowActive() ) {
 			const u32 now = timer->getTime();
@@ -29,23 +32,26 @@ void GameLoop::start_loop() {
 			// - 2nd parameter is the max number of internal substeps.
 			// - 3rt parameter is the number of physics steps to perform (in Hz).
 			// Note that in the intermediate steps the movement is interpolated.
-			const int steps = dynamicsWorld->stepSimulation(now/1000.f, 5, 1/60.0);
+			const int steps = dynamicsWorld->stepSimulation(now/1000.f*time_scale, 25, 1/300.0);
 			// TODO: does it really return the number of steps?
 
-			// manual callbacks of "logic_tick" function for each
-			// object.
-			for(int i = 0; i < steps; i++) {
-				btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
-				for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
-					btRigidBody* body = ((btRigidBody*)objs[j]);
-					// MY objects have a logic tick callback.
-					IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
-					if(myobj) {
-						myobj->logic_tick(*this);
-					}
-				}
-			}
 
+			// TODO: This code needs to be re-done: it takes 70% of cpu time if enabled!
+			// // manual callbacks of "logic_tick" function for each
+			// // object.
+			// for(int i = 0; i < steps; i++) {
+			// 	btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
+			// 	for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
+			// 		btRigidBody* body = ((btRigidBody*)objs[j]);
+			// 		// MY objects have a logic tick callback.
+			// 		IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
+			// 		if(myobj) {
+			// 			myobj->logic_tick(*this);
+			// 		}
+			// 	}
+			// }
+
+#if DEBUG_PHYSOBJECTS
 			{ // FIXME: Debug print of all objects...
 				btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
 				for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
@@ -70,6 +76,7 @@ void GameLoop::start_loop() {
 
 				}
 			}
+#endif
 
 			video::SColor bg_color = video::SColor(255,50,50,50);
 			driver->beginScene(true, true, bg_color);
@@ -127,5 +134,5 @@ bool GameLoop::initialize_bullet() {
 	this->overlappingpaircache = new btDbvtBroadphase();
 	this->solver = new btSequentialImpulseConstraintSolver();
 	this->dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingpaircache, solver, config);
-
+	this->dynamicsWorld->setGravity(this->dynamicsWorld->getGravity()/20);
 }
