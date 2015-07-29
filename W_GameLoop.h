@@ -19,7 +19,6 @@ using namespace irr;
 
 class GameLoop {
  public:
-	std::vector<std::shared_ptr<IGameObject>> game_objects;
 
     IrrlichtDevice *device;
     video::IVideoDriver* driver;
@@ -33,10 +32,16 @@ class GameLoop {
 	btBroadphaseInterface* overlappingpaircache;
 	btSequentialImpulseConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamicsWorld;
-
+    
 	bool initialize_irrlicht(/* config manager */);
 	bool initialize_bullet(/* config manager */);
 	void start_loop();
+
+    void attach(IGameObject* obj);
+    void detach(IGameObject* obj);
+
+ private:
+	std::vector<IGameObject*> event_objs;
 };
 
  

@@ -21,23 +21,6 @@ class IGameObject : public btMotionState{
 	{
 	}
 
-	//! Called each frame.
-	/*!
-	 * Lets the GameObject add/change/remove its own ISceneNodes into
-	 * the scene manager.
-	 *
-	 * Here you should interpolate all the values between the current
-	 * state and the next state. To keep things simple you can just
-	 * set the updated values into the ISceneNode at first.
-	 *
-	 * @param mgr: A reference to the global scene manager.
-	 *
-	 * @param tick_progress: The time that passed from the last call
-	 * to this method
-	 */
-	virtual void render(GameLoop& mgr, float advance) = 0;
-
-
 	//! Called with a fixed rate of 100Hz
 	/*!
 	 * Here you should handle the logic, the network and all the

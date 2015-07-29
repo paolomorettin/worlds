@@ -9,7 +9,19 @@
 // a bit crude, but works.
 #define PRINTVEC(vec) vec.x()<<","<<vec.y()<<","<<vec.z()
 
+void GameLoop::attach(IGameObject* obj) {
+    event_objs.push_back(obj);
+}
 
+void GameLoop::detach(IGameObject* obj) {
+    auto iter = event_objs.begin();
+    for (; iter != event_objs.end(); iter++) {
+        if (*iter == obj) break;
+    }
+    if (iter != event_objs.end()) {
+        event_objs.erase(iter);
+    }
+}
 
 void GameLoop::start_loop() {
 	u32 last_frame_time = timer->getTime();
@@ -36,20 +48,17 @@ void GameLoop::start_loop() {
 			// TODO: does it really return the number of steps?
 
 
-			// TODO: This code needs to be re-done: it takes 70% of cpu time if enabled!
-			// // manual callbacks of "logic_tick" function for each
-			// // object.
-			// for(int i = 0; i < steps; i++) {
-			// 	btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
-			// 	for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
-			// 		btRigidBody* body = ((btRigidBody*)objs[j]);
-			// 		// MY objects have a logic tick callback.
-			// 		IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
-			// 		if(myobj) {
-			// 			myobj->logic_tick(*this);
-			// 		}
-			// 	}
-			// }
+			// manual callbacks of "logic_tick" function for each
+			// object.
+			for (int i = 0; i < dynamicsWorld->getNumCollisionObjects(); i++) {
+		        btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
+                btRigidBody* body = ((btRigidBody*)objs[i]);
+                // MY objects have a logic tick callback.
+                IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
+                if(myobj) {
+                    myobj->logic_tick(*this);
+                }
+			}
 
 #if DEBUG_PHYSOBJECTS
 			{ // FIXME: Debug print of all objects...
@@ -80,9 +89,6 @@ void GameLoop::start_loop() {
 
 			video::SColor bg_color = video::SColor(255,50,50,50);
 			driver->beginScene(true, true, bg_color);
-			for (std::shared_ptr<IGameObject>& obj : game_objects) {
-				obj->render(*this, advancement);
-			}
 			smgr -> drawAll();
 			guienv -> drawAll();
 			driver->endScene();
