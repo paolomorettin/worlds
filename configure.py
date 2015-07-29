@@ -36,17 +36,17 @@ int main() {
 
 
 def find_irrlicht_compile_flags():
-    cflags="-I./irrlicht-1.8.1/include -I/usr/X11R6/include `pkg-config --cflags bullet`"
-    ldflags="-L./irrlicht-1.8.1/lib/Linux -lIrrlicht"
-    ldflags+=" -L/usr/X11R6/lib64 -lGL -lXxf86vm -lXext -lX11 -lXcursor `pkg-config --cflags --libs bullet`"
-    if test_irrlicht_compile_flags(cflags,ldflags):
-        return (cflags, ldflags)
-
     cflags="-I/usr/X11R6/include -I/usr/include/irrlicht/ `pkg-config --cflags bullet`"
     ldflags="-lIrrlicht -L/usr/X11R6/lib64 -lGL -lXxf86vm -lXext -lX11 -lXcursor `pkg-config --cflags --libs bullet`"
     if test_irrlicht_compile_flags(cflags, ldflags):
         return (cflags, ldflags)
     return (None, None)
+
+    cflags="-I./irrlicht-1.8.1/include -I/usr/X11R6/include `pkg-config --cflags bullet`"
+    ldflags="-L./irrlicht-1.8.1/lib/Linux -lIrrlicht"
+    ldflags+=" -L/usr/X11R6/lib64 -lGL -lXxf86vm -lXext -lX11 -lXcursor `pkg-config --cflags --libs bullet`"
+    if test_irrlicht_compile_flags(cflags,ldflags):
+        return (cflags, ldflags)
 
 
 def obtain_sources_list(dirs_to_scan):
@@ -58,7 +58,7 @@ def obtain_sources_list(dirs_to_scan):
         print "Scanning '"+str(dir)+"' for sources...",
         _, _, filenames = next(walk(dir), (None, None, []))
         c_files = [fname for fname in filenames if fname.endswith(".cpp")]
-        h_files = [fname for fname in filenames if fname.endswith(".h")]
+        h_files = [fname for fname in filenames if fname.endswith(".h") or fname.endswith(".hpp")]
         full_list_sources+=c_files
         full_list_headers+=h_files
         print "   found",len(c_files)," source files and", len(h_files), "header files."
