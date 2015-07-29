@@ -54,31 +54,19 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     W_LevelGenerator level = W_LevelGenerator(level_size,1000);
 
     core::list<W_Structure> * structures = level.getStructures();
-    /*
-    // START / END COLLISION TESTS
-    core::list<W_Structure> * structures = new list<W_Structure>();
-    structures -> push_front( W_Structure(0,0,0,10,1,10) );
-    structures -> push_front( W_Structure(9,1,9,1,1,1) );
-    */
 
 
 
     // create the structures
-    core::list<W_Structure>::Iterator iterator;
-    for (iterator = structures -> begin(); iterator != structures -> end(); iterator++) {
+    for (auto& current: *structures) {
 
-		W_Structure current = *iterator;
 		core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
 		core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
-
-		scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"),parent,ID_General);
-
-		//    map_node -> setPosition((scale/2 *size) + scale * position);
 		core::vector3df new_size = (base/modelsize) * size;
+
+		scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"), parent, ID_General);
 		map_node -> setScale(new_size);
 		map_node -> setPosition(new_size  + (base * position));
-
-
 		map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
 
 
@@ -207,7 +195,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		btVector3 init_position(btScalar(sp.X), btScalar(sp.Y), btScalar(sp.Z));
 		// initialize the rigid body transform.
 		btTransform transform(init_rotation, init_position);
-		// set motion state. TODO: Find better way to do this
+		// set motion state. TODO: Find better way to do this, such as passing the position to the constructor.
 		playerObj->setWorldTransform(transform);
 
 		// model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
