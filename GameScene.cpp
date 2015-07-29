@@ -32,7 +32,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 
     }
 
-    // create start/end point
+    // create start point
     vector3d<int> startcell = level.getStart();
     vector3df sp = core::vector3df(1.0/2) + vector3df(startcell.X, startcell.Y, startcell.Z);
 	sp *= world_scale;
@@ -46,91 +46,14 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     start_node -> setID(ID_startnode);
     start_node -> setPosition(sp);
 
-    vector3d<int> endcell = level.getEnd();
+
+    // create end point
     vector3df ep = core::vector3df(1.0/2) + vector3df(endcell.X, endcell.Y, endcell.Z);
 	ep *= world_scale;
+	LevelEnd* level = new LevelEnd();
+	btGhostObject* end_point_rb = level->initialize(level, ep);
 
-    scene::IMeshSceneNode * end_node = smgr -> addSphereSceneNode(0.5);
-    end_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,100,255);
-    end_node -> getMaterial(0).AmbientColor = video::SColor(100,255,100,255);
-    end_node -> getMaterial(0).EmissiveColor = video::SColor(100,255,100,255);
-    end_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
-
-    int ID_endnode = 0;
-    end_node -> setID(ID_endnode);
-    end_node -> setPosition(ep);
-
-    int ID_endlight = 0;
-    scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 10.0f, ID_endlight );
-
-    // "God-ray" volumetric light
-    int ID_godray = 0;
-    scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, ID_godray,
-																		  32,                                // Subdivisions on U axis
-																		  32,                                // Subdivisions on V axis
-																		  video::SColor(0, 150, 20, 150),  // foot color
-																		  video::SColor(0, 0, 0, 0)); // tail color
-
-    if (godray){
-		godray -> setScale(core::vector3df(3.0f, 1000.0f, 3.0f));
-		godray -> setPosition(ep);
-
-        // load textures for animation
-        core::array<video::ITexture*> textures;
-        for (s32 g=1; g < 8; g++){
-            core::stringc tmp;
-            tmp = "./media/portal";
-            tmp += g;
-            tmp += ".bmp";
-            video::ITexture* t = smgr -> getVideoDriver() -> getTexture( tmp.c_str() );
-            textures.push_back(t);
-        }
-
-        // create texture animator
-        scene::ISceneNodeAnimator* glow = smgr->createTextureAnimator(textures, 100);
-
-        // add the animator
-        godray->addAnimator(glow);
-
-        // drop the animator because it was created with a create() function
-        glow->drop();
-    }
-
-
-    int ID_light = 0;
-    scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 50.0f, ID_light );
-
-
-    // scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
-    //     "./media/terrain-heightmap.png",
-    //     0,                  // parent node
-    //     -1,                 // node id
-    //     core::vector3df(0.f, 0.f, 0.f),     // position
-    //     core::vector3df(0.f, 0.f, 0.f),     // rotation
-    //     core::vector3df(level_size.X/4, 20.4f, level_size.Z/4),  // scale
-    //     video::SColor ( 255, 255, 255, 255 ),   // vertexColor
-    //     5,                  // maxLOD
-    //     scene::ETPS_17,             // patchSize
-    //     4                   // smoothFactor
-    //     );
-
-    // terrain->setMaterialFlag(video::EMF_LIGHTING, false);
-
-    // terrain->setMaterialTexture(0,
-    //         smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
-    // terrain->setMaterialTexture(1,smgr -> getVideoDriver() -> getTexture("./media/terrain-texture.png"));
-
-    // terrain->setMaterialType(video::EMT_DETAIL_MAP);
-
-    // terrain->scaleTexture(1.0f, 20.0f);
-
-
-    //   // create triangle selector for the terrain
-    // scene::ITriangleSelector* selector2
-    //     = smgr->createTerrainTriangleSelector(terrain, 0);
-    // terrain->setTriangleSelector(selector2);
-	// metaselector->addTriangleSelector(selector2);
-
+    vector3d<int> endcell = level.getEnd();
 
 	{ // player obj test
 		playerObj = new PlayerGameObj();

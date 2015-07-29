@@ -1,5 +1,8 @@
 #pragma once
 
+#include "W_GameLoop.h"
+#include "W_GameObject.h"
+#include "W_LevelGenerator.h"
 
 class PlayerGameObj: public IGameObject {
 	scene::ICameraSceneNode* camera; // irr camera

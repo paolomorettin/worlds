@@ -141,4 +141,5 @@ bool GameLoop::initialize_bullet() {
 	this->solver = new btSequentialImpulseConstraintSolver();
 	this->dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingpaircache, solver, config);
 	this->dynamicsWorld->setGravity(this->dynamicsWorld->getGravity()/20);
+	this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());  
 }
