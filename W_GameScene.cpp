@@ -47,8 +47,6 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 
     //camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 10, true, 10);
 
-    float base = 100.0;
-    float modelsize = 2.0;
 
     core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
     W_LevelGenerator level = W_LevelGenerator(level_size,1000);
@@ -56,39 +54,16 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     core::list<W_Structure> * structures = level.getStructures();
 
 
+    float base = 100.0;
+    float modelsize = 2.0;
+
 
     // create the structures
-    for (auto& current: *structures) {
+    for (const W_Structure& current: *structures) {
+		StaticStructure* structure = new StaticStructure();
+		btRigidBody* rigidb = structure->initialize(gameloop, current);
+		gameloop.dynamicsWorld->addRigidBody(rigidb);
 
-		core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
-		core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
-		core::vector3df new_size = (base/modelsize) * size;
-
-		scene::IAnimatedMeshSceneNode* map_node = smgr -> addAnimatedMeshSceneNode(smgr -> getMesh("./media/cube.3ds"), parent, ID_General);
-		map_node -> setScale(new_size);
-		map_node -> setPosition(new_size  + (base * position));
-		map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-
-
-		switch (rand() % 3) {
-		case 0 :
-			map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
-			map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,10,255);
-			map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/blue.png") );
-			break;
-		case 1 :
-			map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
-			map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,10,10);
-			map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/red.png") );
-			break;
-		case 2 :
-			map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
-			map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,255,10);
-			map_node -> setMaterialTexture( 0, smgr -> getVideoDriver() -> getTexture("./media/green.png") );
-			break;
-		}
-		map_node -> setMaterialFlag(video::EMF_LIGHTING, true);
-		//    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
     }
 
     // create start/end point
@@ -186,7 +161,8 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 	{ // player obj test
 		playerObj = new PlayerGameObj();
 		playerObj->initialize(gameloop);
-
+		// TODO: All of the following should be moved into playergameobj.initialize 
+		
 		std::cout<<"START PLAYER POS:"<<sp.X<<","<<sp.Y<<","<<sp.Z<<","<<std::endl;
 		// from euler angles, other constructors should be preferred (I
 		// think)
@@ -199,7 +175,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		playerObj->setWorldTransform(transform);
 
 		// model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
-		btCollisionShape* sphere = new btSphereShape(1);
+		btCollisionShape* sphere = new btSphereShape(10);
 
 		// inertia vector.
 		btVector3 inertiavector(0.1,0.1,0.1);
@@ -211,7 +187,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 		gameloop.dynamicsWorld->addRigidBody(test);
 
 		// just as a test, start with some initial velocity
-		test->applyCentralImpulse(btVector3(1, 200, 1));
+		test->applyCentralImpulse(btVector3(10, 200, 10));
 	}
 
     return true;
@@ -241,4 +217,57 @@ void PlayerGameObj::initialize(GameLoop& loop) {
     this->camera->setFarValue(20000);
     this->camera->setNearValue(1);
     this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 100.0f, ID_General);
+}
+
+
+void StaticStructure::logic_tick(GameLoop&) { }
+
+void StaticStructure::render(GameLoop&, float) { }
+
+btRigidBody* StaticStructure::initialize(GameLoop& loop, const W_Structure& current) {
+	
+    float map_scale = 100.0;
+	
+	core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z) * map_scale;
+	core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z) * map_scale/2;
+
+	scene::IAnimatedMeshSceneNode* map_node = loop.smgr -> addAnimatedMeshSceneNode(loop.smgr -> getMesh("./media/cube.3ds"), nullptr, ID_General);
+	map_node -> setScale(size);
+	map_node -> setPosition(position);
+	map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+
+
+	switch (rand() % 3) {
+	case 0 :
+		map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
+		map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,10,255);
+		map_node -> setMaterialTexture( 0, loop.smgr -> getVideoDriver() -> getTexture("./media/blue.png") );
+		break;
+	case 1 :
+		map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
+		map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,10,10);
+		map_node -> setMaterialTexture( 0, loop.smgr -> getVideoDriver() -> getTexture("./media/red.png") );
+		break;
+	case 2 :
+		map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
+		map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,255,10);
+		map_node -> setMaterialTexture( 0, loop.smgr -> getVideoDriver() -> getTexture("./media/green.png") );
+		break;
+	}
+	map_node -> setMaterialFlag(video::EMF_LIGHTING, true);
+	//    map_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+
+	btQuaternion init_rotation(btScalar(0),btScalar(0),btScalar(0));
+	// initial position of the rigid body.
+	btVector3 init_position(btScalar(position.X), btScalar(position.Y), btScalar(position.Z));
+	// initialize the rigid body transform.
+	btTransform transform(init_rotation, init_position);
+	// set motion state. 
+	this->setWorldTransform(transform);
+
+	// model of the building is a box
+	btCollisionShape* sphere = new btBoxShape(btVector3(size.X, size.Y, size.Z));
+
+	// add a static rigid body (mass = 0).
+	return new btRigidBody(0, this, sphere);
 }

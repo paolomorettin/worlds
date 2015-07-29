@@ -47,14 +47,16 @@ public:
 	virtual ~PlayerGameObj() {};
 };
 
+class btRigidBody;
 
 class StaticStructure: public IGameObject {
 	scene::IAnimatedMeshSceneNode* map_node;
 	W_Structure structure_data;
 	// bullet fields are not remembered: the position is constant...
-
+ public:
+	explicit StaticStructure(): structure_data(0,0,0,0,0,0), map_node(nullptr) {};
 	virtual void render(GameLoop&, float);
-	virtual void initialize(GameLoop&, const W_Structure& structure_data);
+	virtual btRigidBody* initialize(GameLoop&, const W_Structure& structure_data);
 	virtual void logic_tick(GameLoop&);
 
 	virtual ~StaticStructure() {};
