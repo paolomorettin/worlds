@@ -12,36 +12,6 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 	scene::ISceneManager * smgr = gameloop.smgr; // TODO: initialize
 	scene::ISceneNode * parent = nullptr;
 
-	// // add the camera (FPS-like)
-    // SKeyMap keyMap[10];
-    // keyMap[0].Action = EKA_MOVE_FORWARD;
-    // keyMap[0].KeyCode = KEY_UP;
-    // keyMap[1].Action = EKA_MOVE_FORWARD;
-    // keyMap[1].KeyCode = KEY_KEY_W;
-
-    // keyMap[2].Action = EKA_MOVE_BACKWARD;
-    // keyMap[2].KeyCode = KEY_DOWN;
-    // keyMap[3].Action = EKA_MOVE_BACKWARD;
-    // keyMap[3].KeyCode = KEY_KEY_S;
-
-    // keyMap[4].Action = EKA_STRAFE_LEFT;
-    // keyMap[4].KeyCode = KEY_LEFT;
-    // keyMap[5].Action = EKA_STRAFE_LEFT;
-    // keyMap[5].KeyCode = KEY_KEY_A;
-
-    // keyMap[6].Action = EKA_STRAFE_RIGHT;
-    // keyMap[6].KeyCode = KEY_RIGHT;
-    // keyMap[7].Action = EKA_STRAFE_RIGHT;
-    // keyMap[7].KeyCode = KEY_KEY_D;
-
-    // keyMap[8].Action = EKA_CROUCH;
-    // keyMap[8].KeyCode = KEY_SHIFT;
-
-    // keyMap[9].Action = EKA_JUMP_UP;
-    // keyMap[9].KeyCode = KEY_SPACE;
-
-    //camera = smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 10, true, 10);
-
 
     core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
     W_LevelGenerator level = W_LevelGenerator(level_size,1000);
@@ -72,7 +42,8 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     start_node -> getMaterial(0).AmbientColor = video::SColor(100,0,255,0);
     start_node -> getMaterial(0).EmissiveColor = video::SColor(100,0,255,0);
     start_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
-    start_node -> setID(ID_Start | ID_StartEnd);
+    int ID_startnode = 0;
+    start_node -> setID(ID_startnode);
     start_node -> setPosition(sp);
 
     vector3d<int> endcell = level.getEnd();
@@ -85,13 +56,16 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     end_node -> getMaterial(0).EmissiveColor = video::SColor(100,255,100,255);
     end_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
 
-    end_node -> setID(ID_End | ID_StartEnd);
+    int ID_endnode = 0;
+    end_node -> setID(ID_endnode);
     end_node -> setPosition(ep);
 
-    scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 10.0f, ID_General );
+    int ID_endlight = 0;
+    scene::ILightSceneNode * end_light = smgr -> addLightSceneNode( end_node, core::vector3df(0,0,0), video::SColor(255,255,50,255), 10.0f, ID_endlight );
 
     // "God-ray" volumetric light
-    scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, ID_General,
+    int ID_godray = 0;
+    scene::IVolumeLightSceneNode * godray = smgr->addVolumeLightSceneNode(0, ID_godray,
 																		  32,                                // Subdivisions on U axis
 																		  32,                                // Subdivisions on V axis
 																		  video::SColor(0, 150, 20, 150),  // foot color
@@ -123,7 +97,8 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     }
 
 
-    scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 50.0f, ID_General );
+    int ID_light = 0;
+    scene::ILightSceneNode* light2 = smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 50.0f, ID_light );
 
 
     // scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
@@ -210,7 +185,8 @@ btRigidBody* StaticStructure::initialize(GameLoop& loop, const W_Structure& curr
 	core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
 	core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
 
-	scene::IAnimatedMeshSceneNode* map_node = loop.smgr -> addAnimatedMeshSceneNode(loop.smgr -> getMesh("./media/cube.3ds"), nullptr, ID_General);
+	int ID_mapnode;
+	scene::IAnimatedMeshSceneNode* map_node = loop.smgr -> addAnimatedMeshSceneNode(loop.smgr -> getMesh("./media/cube.3ds"), nullptr, ID_mapnode);
 	map_node -> setScale(size);
 	map_node -> setPosition(position);
 	map_node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
