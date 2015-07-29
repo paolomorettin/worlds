@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bullet/LinearMath/btDefaultMotionState.h>
+#include <string>
 
 class GameLoop;
 

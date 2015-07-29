@@ -1,6 +1,7 @@
 #include "GameScene.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include "LevelGenerator.hpp"
+#include "LevelEnd.hpp"
 
 #include <iostream>
 // used in the camera initialization: wtf is the meaning of this?
@@ -48,12 +49,12 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
 
 
     // create end point
-    vector3df ep = core::vector3df(1.0/2) + vector3df(endcell.X, endcell.Y, endcell.Z);
-	ep *= world_scale;
-	LevelEnd* level = new LevelEnd();
-	btGhostObject* end_point_rb = level->initialize(level, ep);
 
     vector3d<int> endcell = level.getEnd();
+    vector3df ep = core::vector3df(1.0/2) + vector3df(endcell.X, endcell.Y, endcell.Z);
+	ep *= world_scale;
+	LevelEndObj* levelend = new LevelEndObj();
+	btGhostObject* end_point_rb = levelend->initialize(gameloop, ep);
 
 	{ // player obj test
 		playerObj = new PlayerGameObj();

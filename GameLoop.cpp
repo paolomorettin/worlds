@@ -1,5 +1,6 @@
 #include "GameLoop.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
+#include <bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 
 #define DEBUG_PHYSOBJECTS 0
 
@@ -50,14 +51,8 @@ void GameLoop::start_loop() {
 
 			// manual callbacks of "logic_tick" function for each
 			// object.
-			for (int i = 0; i < dynamicsWorld->getNumCollisionObjects(); i++) {
-		        btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
-                btRigidBody* body = ((btRigidBody*)objs[i]);
-                // MY objects have a logic tick callback.
-                IGameObject* myobj = dynamic_cast<IGameObject*>(body->getMotionState());
-                if(myobj) {
-                    myobj->logic_tick(*this);
-                }
+			for (IGameObject* obj: event_objs) {
+				obj->logic_tick(*this);
 			}
 
 #if DEBUG_PHYSOBJECTS
