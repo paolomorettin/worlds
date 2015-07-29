@@ -6,12 +6,7 @@
 // used in the camera initialization: wtf is the meaning of this?
 // used also in collision detection for the start and end
 // TODO: CODE DUPLICATION! This is also in main.cpp
-enum {
-    ID_General = 0,
-    ID_StartEnd = 1,
-    ID_Start = 1 << 1,
-    ID_End = 1 << 2
-};
+
 bool MainGameScene::initialize(GameLoop& gameloop) {
 
 	scene::ISceneManager * smgr = gameloop.smgr; // TODO: initialize
@@ -89,6 +84,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     end_node -> getMaterial(0).AmbientColor = video::SColor(100,255,100,255);
     end_node -> getMaterial(0).EmissiveColor = video::SColor(100,255,100,255);
     end_node -> getMaterial(0).ColorMaterial = video::ECM_NONE;
+
     end_node -> setID(ID_End | ID_StartEnd);
     end_node -> setPosition(ep);
 
@@ -203,24 +199,6 @@ void MainGameScene::logic_tick(GameLoop&) {
 }
 
 
-
-void PlayerGameObj::logic_tick(GameLoop&) {
-	// logic tickling :D
-	// here you should handle the keyboard input...
-}
-
-void PlayerGameObj::render(GameLoop&, float) {
-	// all done by irr
-}
-
-void PlayerGameObj::initialize(GameLoop& loop) {
-    SKeyMap keyMap[1]; // sorry, currently disabled.
-	// I don't want irr to interfere with bullet positions by moving the graphics object and not the phyisics one.
-	this->camera = loop.smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_General, keyMap, 0, true, 10);
-    this->camera->setFarValue(200);
-    this->camera->setNearValue(0.01);
-    this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 3.0f, ID_General);
-}
 
 
 void StaticStructure::logic_tick(GameLoop&) { }
