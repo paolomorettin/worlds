@@ -1,6 +1,7 @@
 #include "GameLoop.hpp"
 #include "GameObject.hpp"
 #include "LevelGenerator.hpp"
+#include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 
 #include "Player.hpp"
 
@@ -13,7 +14,7 @@ void PlayerGameObj::render(GameLoop&, float) {
 	// all done by irr
 }
 
-void PlayerGameObj::initialize(GameLoop& loop) {
+btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_pos) {
 
     SKeyMap keyMap[10];
     keyMap[0].Action = EKA_MOVE_FORWARD;
@@ -48,4 +49,32 @@ void PlayerGameObj::initialize(GameLoop& loop) {
     this->camera->setNearValue(0.01);
     int ID_playerlight = 0;
     this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 3.0f, ID_playerlight);
+
+
+	// Only a rename, sorry!
+	const vector3df& sp = start_pos;
+    // player obj test
+    // TODO: All of the following should be moved into playergameobj.initialize 
+    //std::cout<<"START PLAYER POS:"<<sp.X<<","<<sp.Y<<","<<sp.Z<<","<<std::endl;
+    // from euler angles, other constructors should be preferred (I
+    // think)
+    btQuaternion init_rotation(btScalar(0.01),btScalar(0.01),btScalar(0.01));
+    // initial position of the rigid body.
+    btVector3 init_position(btScalar(sp.X), btScalar(sp.Y), btScalar(sp.Z));
+    // initialize the rigid body transform.
+    btTransform transform(init_rotation, init_position);
+    // set motion state.
+    setWorldTransform(transform);
+
+    // model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
+    btCollisionShape* sphere = new btSphereShape(0.2);
+
+    // inertia vector.
+    btVector3 inertiavector(0.1,0.1,0.1);
+
+    // add the rigid body
+    // mass of 80 kg.
+    rigid_body = new btRigidBody(80, this, sphere, inertiavector);
+	return rigid_body;
+
 }

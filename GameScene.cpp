@@ -52,37 +52,11 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
   LevelEndObj* levelend = new LevelEndObj();
   btGhostObject* end_point_rb = levelend->initialize(gameloop, ep);
 
-  { // player obj test
-    playerObj = new PlayerGameObj();
-    playerObj->initialize(gameloop);
-    // TODO: All of the following should be moved into playergameobj.initialize 
-		
-    std::cout<<"START PLAYER POS:"<<sp.X<<","<<sp.Y<<","<<sp.Z<<","<<std::endl;
-    // from euler angles, other constructors should be preferred (I
-    // think)
-    btQuaternion init_rotation(btScalar(0.01),btScalar(0.01),btScalar(0.01));
-    // initial position of the rigid body.
-    btVector3 init_position(btScalar(sp.X), btScalar(sp.Y), btScalar(sp.Z));
-    // initialize the rigid body transform.
-    btTransform transform(init_rotation, init_position);
-    // set motion state. TODO: Find better way to do this, such as passing the position to the constructor.
-    playerObj->setWorldTransform(transform);
-
-    // model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
-    btCollisionShape* sphere = new btSphereShape(0.2);
-
-    // inertia vector.
-    btVector3 inertiavector(0.1,0.1,0.1);
-
-    // add the rigid body
-    // mass of 80 kg.
-
-    btRigidBody* test = new btRigidBody(80, playerObj, sphere, inertiavector);
-    gameloop.dynamicsWorld->addRigidBody(test);
-
-    // just as a test, start with some initial velocity
-    //test->applyCentralImpulse(btVector3(30, -200, 30));
-  }
+  playerObj = new PlayerGameObj();
+  btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
+  gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
+  // just as a test, start with some initial velocity
+  player_rigid_body->applyCentralImpulse(btVector3(30, -200, 30));
 
   return true;
 }
