@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 project (Worlds CXX)
 
+set(CMAKE_CXX_FLAGS "-O0 -ffast-math -std=c++11 -g -Wall -Wextra -pedantic -Wno-unused-parameter")
+
 set (BIN_DIR "${CMAKE_SOURCE_DIR}/bin")
 set (SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
@@ -30,4 +32,3 @@ endif (BULLET_FOUND)
 # TODO function (import_lib lib_name)
 
 # endfunction(import_lib)
-
