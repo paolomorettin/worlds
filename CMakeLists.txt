@@ -6,8 +6,9 @@ set(CMAKE_CXX_FLAGS "-O0 -ffast-math -std=c++11 -g -Wall -Wextra -pedantic -Wno-
 set (BIN_DIR "${CMAKE_SOURCE_DIR}/bin")
 set (SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
+file (GLOB SOURCE_FILES "${SOURCE_DIR}/*.cpp")
 
-add_executable(worlds ${SOURCE_DIR}/main.cpp)
+add_executable(worlds ${SOURCE_FILES})
 
 # Libraries management
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -28,7 +29,3 @@ else()
     message(FATAL_ERROR "Package Bullet not found!")
 endif (BULLET_FOUND)
 
-
-# TODO function (import_lib lib_name)
-
-# endfunction(import_lib)
