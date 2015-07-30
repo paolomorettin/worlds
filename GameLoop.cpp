@@ -36,7 +36,7 @@ void GameLoop::start_loop() {
 
       // check for keyboard input
       if(evrecv -> IsKeyDown(irr::KEY_KEY_W)){
-	player -> setLinearVelocity(movement_velocity);
+	//player -> setLinearVelocity(movement_velocity);
 	printf("W\n");
       } else if(evrecv -> IsKeyDown(irr::KEY_KEY_S))
 	printf("S\n");
