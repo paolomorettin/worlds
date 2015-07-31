@@ -56,7 +56,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
   btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
   gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
   // just as a test, start with some initial velocity
-  player_rigid_body->applyCentralImpulse(btVector3(30, -200, 30));
+  //player_rigid_body->applyCentralImpulse(btVector3(30, -200, 30));
 
   return true;
 }

@@ -28,24 +28,8 @@ void GameLoop::start_loop() {
   u32 last_frame_time = timer->getTime();
   float time_scale = 1; // change for fun effects
 
-  // for testing purposes
-  float movement_velocity = 1.0;
-
   while(device -> run()) {
     if (device -> isWindowActive() ) {
-
-      // check for keyboard input
-      if(evrecv -> IsKeyDown(irr::KEY_KEY_W)){
-	//player -> setLinearVelocity(movement_velocity);
-	printf("W\n");
-      } else if(evrecv -> IsKeyDown(irr::KEY_KEY_S))
-	printf("S\n");
-
-      if(evrecv -> IsKeyDown(irr::KEY_KEY_A))
-	printf("A\n");
-      else if(evrecv -> IsKeyDown(irr::KEY_KEY_D))
-	printf("D\n");
-		  
 
       const u32 now = timer->getTime();
       u32 advancement = now - last_frame_time;

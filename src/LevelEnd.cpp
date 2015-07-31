@@ -73,7 +73,7 @@ btGhostObject* LevelEndObj::initialize(GameLoop& loop, const irr::core::vector3d
 }
 
 void LevelEndObj::logic_tick(GameLoop&){
-	std::cout<<"End collides with "<<ghostObject->getNumOverlappingObjects()<<std::endl;
+  //std::cout<<"End collides with "<<ghostObject->getNumOverlappingObjects()<<std::endl;
 	
 	for(int i = 0; i < ghostObject->getNumOverlappingObjects(); i++) {
 		btRigidBody *body = dynamic_cast<btRigidBody *>(ghostObject->getOverlappingObject(i));
