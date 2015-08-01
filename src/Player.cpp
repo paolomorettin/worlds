@@ -4,30 +4,47 @@
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 
 #include "Player.hpp"
+#include <iostream>
 
 void PlayerGameObj::logic_tick(GameLoop& loop) {
 
-  // I'm expecting a huge fail here.
-  printf("WHAAW!\n");
-  // for testing purposes
-  float movement_velocity = 1.0;
-  irr::core::vector3df cd = camera -> getTarget();
-  btVector3 direction = btVector3(cd.X,cd.Y,cd.Z);
-  // check for keyboard input
-  if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_W)){
-    rigid_body -> setLinearVelocity(direction);
-    printf("W\n");
-  } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S))
-    printf("S\n");
+    // for testing purposes
+    float movement_velocity = 1.0;
+    
+    irr::core::vector3df cd = camera -> getTarget();
+    btVector3 direction = btVector3(1000,0,0);
 
-  if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A))
-    printf("A\n");
-  else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D))
-    printf("D\n");		  
+    core::vector3df camPosition = camera->getPosition();
+    
+    // get the 'position' of the thing that the camera (node) is pointed at
+    irr::core::vector3df camTarget = camera->getTarget();
+
+    // figure out the 'direction' vector that describes the relative position of the camera to it's target:
+    irr::core::vector3df camDirection = camTarget - camPosition;
+
+    // scale the direction vector for frame-rate independent speed:
+    irr::core::vector3df camMovement = camDirection.normalize();
+    camMovement = camMovement * movement_velocity;
+
+    btVector3 movement = btVector3(camMovement.X, camMovement.Y, camMovement.Z);
+
+
+    std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
+    // check for keyboard input
+    if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_W)){
+        rigid_body -> applyCentralImpulse(movement);
+        printf("W\n");
+    } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S))
+        printf("S\n");
+
+    if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A))
+        printf("A\n");
+    else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D))
+        printf("D\n");        
 }
 
 void PlayerGameObj::render(GameLoop&, float) {
-	// all done by irr
+    // all done by irr
 }
 
 btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_pos) {
