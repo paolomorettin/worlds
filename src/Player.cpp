@@ -1,29 +1,24 @@
-#include "GameLoop.hpp"
-#include "GameObject.hpp"
+#include "Player.hpp"
 #include "LevelGenerator.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 
-#include "Player.hpp"
 
 void PlayerGameObj::logic_tick(GameLoop& loop) {
 
-  // I'm expecting a huge fail here.
-  printf("WHAAW!\n");
   // for testing purposes
   float movement_velocity = 1.0;
   irr::core::vector3df cd = camera -> getTarget();
   btVector3 direction = btVector3(cd.X,cd.Y,cd.Z);
   // check for keyboard input
-  if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_W)){
+  if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_W)) {
     rigid_body -> setLinearVelocity(direction);
-    printf("W\n");
-  } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S))
-    printf("S\n");
+  
+  } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S)) {
+    
+  }
 
-  if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A))
-    printf("A\n");
-  else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D))
-    printf("D\n");		  
+  if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A)) {}
+  else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D)) {}
 }
 
 void PlayerGameObj::render(GameLoop&, float) {

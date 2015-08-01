@@ -6,7 +6,7 @@
 #include "EventReceiver.hpp"
 #include "Structure.hpp"
 #include "Timer.hpp"
-#include "GameObject.hpp"
+#include "IGameObject.hpp"
 #include "GameScene.hpp"
 #include "LevelGenerator.hpp"
 

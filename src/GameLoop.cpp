@@ -1,4 +1,5 @@
 #include "GameLoop.hpp"
+#include "IGameObject.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include <bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 

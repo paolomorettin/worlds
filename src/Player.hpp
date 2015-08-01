@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameLoop.hpp"
-#include "GameObject.hpp"
+#include "IGameObject.hpp"
 #include "LevelGenerator.hpp"
 class btRigidBody;
 

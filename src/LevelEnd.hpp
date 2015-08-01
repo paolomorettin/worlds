@@ -2,7 +2,7 @@
 
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include <bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
-#include "GameObject.hpp"
+#include "IGameObject.hpp"
 #include <irrlicht.h>
 
 class LevelEndObj: public IGameObject {

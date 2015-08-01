@@ -7,7 +7,6 @@
 #include <vector>
 #include <memory>
 
-#include "GameObject.hpp"
 #include "EventReceiver.hpp"
 
 class btDefaultCollisionConfiguration;
@@ -15,6 +14,7 @@ class btCollisionDispatcher;
 class btBroadphaseInterface;
 class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
+class IGameObject;
 
 using namespace irr;
 

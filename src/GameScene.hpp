@@ -2,7 +2,7 @@
 #define GAME_SCENE_H
 
 #include "GameLoop.hpp"
-#include "GameObject.hpp"
+#include "IGameObject.hpp"
 #include "LevelGenerator.hpp"
 #include "Player.hpp"
 
