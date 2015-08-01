@@ -67,6 +67,11 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 3.0f, ID_playerlight);
 
 
+
+	
+	loop.attach(this);
+	
+
 	// Only a rename, sorry!
 	const vector3df& sp = start_pos;
     // player obj test
