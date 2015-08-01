@@ -29,15 +29,19 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
     // check for keyboard input
     if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_W)){
-        rigid_body -> applyCentralImpulse(movement);
+        rigid_body -> setLinearVelocity(movement);
         printf("W\n");
-    } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S))
+    } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S)) {
+        rigid_body -> setLinearVelocity(-movement);
         printf("S\n");
+    }
 
-    if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A))
+
+    if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A)) {
         printf("A\n");
-    else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D))
+    } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D)) {
         printf("D\n");
+    }
 }
 
 void PlayerGameObj::render(GameLoop&, float) {
