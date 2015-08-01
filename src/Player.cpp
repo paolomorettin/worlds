@@ -62,16 +62,14 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
     // check for keyboard input
     if (move_cmd[FORWARD]) {
-        rigid_body -> applyCentralImpulse(movement);
-        printf("W\n");
+        rigid_body -> setLinearVelocity(movement);
     } else if (move_cmd[BACKWARD]) {
-        printf("S\n");
+        rigid_body -> setLinearVelocity(-movement);
     }
 
     if (move_cmd[RIGHT]) {
         printf("A\n");
-    }
-    else if (move_cmd[LEFT]) {
+    } else if (move_cmd[LEFT]) {
         printf("D\n");
     }
 
