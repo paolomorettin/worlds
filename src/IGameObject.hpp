@@ -2,10 +2,32 @@
 
 #include <bullet/LinearMath/btDefaultMotionState.h>
 #include <string>
+#include <set>
+#include <irrlicht.h>
+#include "EventReceiver.hpp"
 
 class GameLoop;
 
 class IGameObject : public btMotionState{
+    std::set<std::pair<EventReceiver*, irr::EEVENT_TYPE>> observed_events;
+
+    void observe(EventReceiver *evt_recv, irr::EEVENT_TYPE evt_t) {
+        std::pair<EventReceiver*, irr::EEVENT_TYPE> evt_pair;
+        evt_pair = std::make_pair(evt_recv, evt_t);
+        if (observed_events.find(evt_pair) == observed_events.end()) {
+            evt_recv->attach(this, evt_t);
+            observed_events.insert(evt_pair);
+        }
+    }
+
+    void deobserve(EventReceiver *evt_recv, irr::EEVENT_TYPE evt_t) {
+        std::pair<EventReceiver*, irr::EEVENT_TYPE> evt_pair;
+        evt_pair = std::make_pair(evt_recv, evt_t);
+        if (observed_events.find(evt_pair) == observed_events.end()) {
+            evt_recv->detach(this, evt_t);
+            observed_events.erase(evt_pair);
+        }
+    }
 
  public:
     btTransform m_graphicsWorldTrans;
@@ -21,6 +43,9 @@ class IGameObject : public btMotionState{
           m_startWorldTrans(btTransform::getIdentity())
     {
     }
+
+
+    virtual void notify(const irr::SEvent& evt) = 0;
 
     //! Called with a fixed rate of 100Hz
     /*!
@@ -45,6 +70,10 @@ class IGameObject : public btMotionState{
     }
 
 
-    virtual ~IGameObject() {};
+    virtual ~IGameObject() {
+        for (auto evt : observed_events) {
+            evt.first->detach(this, evt.second);
+        }
+    };
 };
 

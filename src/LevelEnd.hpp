@@ -17,6 +17,7 @@ public:
 
 		virtual btGhostObject* initialize(GameLoop&, const irr::core::vector3df& position);
 	virtual void logic_tick(GameLoop&);
+    virtual void notify(const irr::SEvent& evt);
 
 	virtual ~LevelEndObj() {};
 };

@@ -18,12 +18,10 @@ using namespace irr;
 
 int main(int argc, char** argv)
 {
-    EventReceiver receiver;
 
     video::SColor bg_color = video::SColor(255,50,50,50);
 
     GameLoop loop;
-    loop.evrecv = &receiver;
     loop.initialize_irrlicht();
     loop.initialize_bullet();
 

@@ -16,6 +16,7 @@ class MainGameScene : public IGameObject {
 
 	virtual void render(GameLoop&, float);
 	virtual void logic_tick(GameLoop&);
+    virtual void notify(const irr::SEvent& evt);
 
     bool initialize(GameLoop& loop);
 	
@@ -34,6 +35,7 @@ class StaticStructure: public IGameObject {
 	virtual void render(GameLoop&, float);
 	virtual btRigidBody* initialize(GameLoop&, const Structure& structure_data);
 	virtual void logic_tick(GameLoop&);
+    virtual void notify(const irr::SEvent& evt);
 
 	virtual ~StaticStructure() {};
 };

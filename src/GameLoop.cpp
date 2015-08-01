@@ -11,6 +11,14 @@
 // a bit crude, but works.
 #define PRINTVEC(vec) vec.x()<<","<<vec.y()<<","<<vec.z()
 
+GameLoop::GameLoop() {
+    ev_recv = new EventReceiver();
+}
+
+GameLoop::~GameLoop() {
+    delete ev_recv;
+}
+
 void GameLoop::attach(IGameObject* obj) {
   event_objs.push_back(obj);
 }
@@ -122,7 +130,7 @@ bool GameLoop::initialize_irrlicht() {
 			      fullscreen,
 			      stencilbuffer,
 			      vsync,
-			      this->evrecv);
+			      this->ev_recv);
 
   if (device == 0)
     return false; // could not create selected driver.

@@ -91,3 +91,5 @@ void LevelEndObj::logic_tick(GameLoop&){
 		std::cout<<" - '"<<itemname<<"'"<<std::endl;
 	}
 }
+
+void LevelEndObj::notify(const irr::SEvent& evt) {}

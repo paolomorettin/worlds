@@ -2,6 +2,39 @@
 #include "LevelGenerator.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include <iostream>
+#include <irrlicht.h>
+
+
+void PlayerGameObj::notify (const SEvent& evt) {
+    if (evt.EventType == irr::EET_KEY_INPUT_EVENT)
+        handle_key_event(evt);
+    else
+        printf("WARNING: unexpected event %d not handled by player\n", evt.EventType);
+}
+
+void PlayerGameObj::handle_key_event(const SEvent& evt) {
+    unsigned cmd;
+    switch (evt.KeyInput.Key) {
+        case irr::KEY_KEY_W:
+            cmd = FORWARD;
+            break;
+        case irr::KEY_KEY_S:
+            cmd = BACKWARD;
+            break;
+        case irr::KEY_KEY_A:
+            cmd = LEFT;
+            break;
+        case irr::KEY_KEY_D:
+            cmd = RIGHT;
+            break;
+        case irr::KEY_SPACE:
+            cmd = JUMP;
+            break;
+        default:
+            return;
+    }
+    move_cmd[cmd] = evt.KeyInput.PressedDown;
+}
 
 void PlayerGameObj::logic_tick(GameLoop& loop) {
 
@@ -28,16 +61,23 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
     // check for keyboard input
-    if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_W)){
+    if (move_cmd[FORWARD]) {
         rigid_body -> applyCentralImpulse(movement);
         printf("W\n");
-    } else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_S))
+    } else if (move_cmd[BACKWARD]) {
         printf("S\n");
+    }
 
-    if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_A))
+    if (move_cmd[RIGHT]) {
         printf("A\n");
-    else if(loop.evrecv -> IsKeyDown(irr::KEY_KEY_D))
+    }
+    else if (move_cmd[LEFT]) {
         printf("D\n");
+    }
+
+    if (move_cmd[JUMP]) {
+        printf("Jump like you were in Van Halen!\n");
+    }
 }
 
 void PlayerGameObj::render(GameLoop&, float) {
@@ -45,34 +85,9 @@ void PlayerGameObj::render(GameLoop&, float) {
 }
 
 btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_pos) {
+    (loop.get_event_receiver())->attach(this, irr::EET_KEY_INPUT_EVENT);
 
-    SKeyMap keyMap[10];
-    keyMap[0].Action = EKA_MOVE_FORWARD;
-    keyMap[0].KeyCode = KEY_UP;
-    keyMap[1].Action = EKA_MOVE_FORWARD;
-    keyMap[1].KeyCode = KEY_KEY_W;
-
-    keyMap[2].Action = EKA_MOVE_BACKWARD;
-    keyMap[2].KeyCode = KEY_DOWN;
-    keyMap[3].Action = EKA_MOVE_BACKWARD;
-    keyMap[3].KeyCode = KEY_KEY_S;
-
-    keyMap[4].Action = EKA_STRAFE_LEFT;
-    keyMap[4].KeyCode = KEY_LEFT;
-    keyMap[5].Action = EKA_STRAFE_LEFT;
-    keyMap[5].KeyCode = KEY_KEY_A;
-
-    keyMap[6].Action = EKA_STRAFE_RIGHT;
-    keyMap[6].KeyCode = KEY_RIGHT;
-    keyMap[7].Action = EKA_STRAFE_RIGHT;
-    keyMap[7].KeyCode = KEY_KEY_D;
-
-    keyMap[8].Action = EKA_CROUCH;
-    keyMap[8].KeyCode = KEY_SHIFT;
-
-    keyMap[9].Action = EKA_JUMP_UP;
-    keyMap[9].KeyCode = KEY_SPACE;
-
+    SKeyMap *keyMap;
     int ID_camera = 0; // <- are you kidding me? no.
     this->camera = loop.smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_camera, keyMap, 0, true, 10);
     this->camera->setFarValue(200);
@@ -80,14 +95,10 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     int ID_playerlight = 0;
     this->playerlight = loop.smgr->addLightSceneNode(camera, core::vector3df(0,0,0), video::SColor(255,255,255,255), 3.0f, ID_playerlight);
 
+    loop.attach(this);
 
-
-	
-	loop.attach(this);
-	
-
-	// Only a rename, sorry!
-	const vector3df& sp = start_pos;
+    // Only a rename, sorry!
+    const vector3df& sp = start_pos;
     // player obj test
     // TODO: All of the following should be moved into playergameobj.initialize 
     //std::cout<<"START PLAYER POS:"<<sp.X<<","<<sp.Y<<","<<sp.Z<<","<<std::endl;
@@ -110,6 +121,6 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     // add the rigid body
     // mass of 80 kg.
     rigid_body = new btRigidBody(80, this, sphere, inertiavector);
-	return rigid_body;
+    return rigid_body;
 
 }

@@ -5,6 +5,9 @@
 
 #include <iostream>
 
+void MainGameScene::notify(const irr::SEvent& evt) {}
+void StaticStructure::notify(const irr::SEvent& evt) {}
+
 bool MainGameScene::initialize(GameLoop& gameloop) {
 
   scene::ISceneManager * smgr = gameloop.smgr; // TODO: initialize
