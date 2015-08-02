@@ -1,16 +1,20 @@
 Worlds
+Worlds is a simple platform game we are developing in our free time.
+
+* Dependencies
+You need to have the following libraries and programs installed in order to compile Worlds:
+- irrlicht
+- bullet
+- cmake
 
 * Compilation
-
-To compile run:
-: $ ./configure.py
-: $ make -j8
-
-
+: $ cmake .
+: $ make
 
 * Running:
+You can launch the game by running
+: $ ./bin/worlds
+Because of some dependencies (data file stored in the ./media folder) it only works if you launch it from the root of the project.
+You can move using the arrow keys, the spacebar and the mouse.
 
-Launch the game by running
-: $ ./bin/Worlds
-Note that it will not work if you launch it in any directory other
-than the root of the project (it requires some data files in ./media).
+Enjoy!
