@@ -3,6 +3,7 @@
 #include "LevelGenerator.hpp"
 #include "LevelEnd.hpp"
 #include "GameLoop.hpp"
+#include "LevelTimer.hpp"
 #include "Player.hpp"
 
 #include <iostream>
@@ -49,17 +50,22 @@ bool GameScene::create_scene(GameLoop& gameloop) {
 
 
     // create end point
-
     vector3d<int> endcell = level.getEnd();
     vector3df ep = core::vector3df(1.0/2) + vector3df(endcell.X, endcell.Y, endcell.Z);
     ep *= world_scale;
     LevelEndObj* levelend = new LevelEndObj();
     btRigidBody* end_point_rb = levelend->initialize(gameloop, ep);
+    gameloop.dynamicsWorld->addRigidBody(end_point_rb);
 
+    // Create timer
+    level_timer = new LevelTimer();
+    level_timer->initialize(gameloop);
+    level_timer->start();
+
+    // Create player
     playerObj = new Player();
     btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
     gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
-    gameloop.dynamicsWorld->addRigidBody(end_point_rb);
     // just as a test, start with some initial velocity
     return true;
 }

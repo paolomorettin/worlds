@@ -31,11 +31,12 @@ class IGameObject : public btMotionState{
     }
 
     public:
+    
+    std::string name;
     btTransform m_graphicsWorldTrans;
     btTransform m_centerOfMassOffset;
     btTransform m_startWorldTrans;
 
-    std::string name;
 
     explicit IGameObject(std::string name = std::string("[unknown]"))
         : btMotionState(), name(name),
@@ -46,7 +47,8 @@ class IGameObject : public btMotionState{
     }
 
 
-    virtual void notify(const irr::SEvent& evt) = 0;
+    virtual void notify(const irr::SEvent& evt) {
+    }
 
     //! Called with a fixed rate of 300Hz
     /*!

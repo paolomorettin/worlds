@@ -7,11 +7,12 @@
 
 class GameLoop;
 class Player;
-
+class LevelTimer;
 
 class GameScene : public IScene {
     const float world_scale = 1; // affects structures
     Player* playerObj = nullptr;
+    LevelTimer* level_timer = nullptr;
 
  public:
     virtual bool create_scene(GameLoop& loop);
