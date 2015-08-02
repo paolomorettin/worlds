@@ -1,4 +1,4 @@
-Worlds
+* Worlds
 Worlds is a simple platform game we are developing in our free time.
 
 * Dependencies
