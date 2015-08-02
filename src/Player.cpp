@@ -5,6 +5,7 @@
 #include <iostream>
 #include <irrlicht.h>
 #include <iostream>
+#include <cmath>
 
 
 void PlayerGameObj::notify (const SEvent& evt) {
@@ -41,7 +42,7 @@ void PlayerGameObj::handle_key_event(const SEvent& evt) {
 void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // for testing purposes
-    float movement_velocity = 0.01;
+    float movement_velocity = 0.1;
     float jump_strength = 100.00;
 
     irr::core::vector3df cd = camera -> getTarget();
@@ -84,12 +85,19 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // Get the previous velocity. The acceleration we get depends on this.
     const btVector3& velocity = rigid_body->getLinearVelocity();
-    
-    // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
-    const float vellenght = velocity.length();
-    movement *= 1/(vellenght > 0.01 ? vellenght : 0.01);
-    // impulse for the movement!
-    rigid_body -> applyCentralImpulse(movement);
+
+    const btVector3 air_resistance((velocity.x()*velocity.x()*velocity.x())/100,
+                                   (velocity.y()*velocity.y()*velocity.y())/100,
+                                   (velocity.z()*velocity.z()*velocity.z())/100);
+    movement -= air_resistance;
+    if (movement != btVector3(0,0,0)) {
+        // Speed modulation: get the "coefficient of change"
+        // 1 = trying to accelerate in the reverse direction of the movement.
+        // 0.5 = perpendicolar (or was stopped)
+        // 0 = in the same direction
+        
+        rigid_body -> applyCentralImpulse(movement);
+    }
 
     if (move_cmd[JUMP] && velocity.y() < 0 ) {
         rigid_body -> applyCentralImpulse(btVector3(0, jump_strength, 0));
@@ -137,8 +145,8 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     btCollisionShape* sphere = new btSphereShape(0.4);
 
     // inertia vector:
-    // mass of 80 kg.
-    const btScalar mass = 80;
+    // mass of 100 kg.
+    const btScalar mass = 100;
     btVector3 inertiavector(0,0,0);
     sphere->calculateLocalInertia(mass, inertiavector);
 
