@@ -56,7 +56,7 @@ bool GameScene::create_scene(GameLoop& gameloop) {
     LevelEndObj* levelend = new LevelEndObj();
     btRigidBody* end_point_rb = levelend->initialize(gameloop, ep);
 
-    playerObj = new PlayerGameObj();
+    playerObj = new Player();
     btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
     gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
     gameloop.dynamicsWorld->addRigidBody(end_point_rb);

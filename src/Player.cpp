@@ -7,14 +7,14 @@
 #include <iostream>
 
 
-void PlayerGameObj::notify (const SEvent& evt) {
+void Player::notify (const SEvent& evt) {
     if (evt.EventType == irr::EET_KEY_INPUT_EVENT)
         handle_key_event(evt);
     else
         printf("WARNING: unexpected event %d not handled by player\n", evt.EventType);
 }
 
-void PlayerGameObj::handle_key_event(const SEvent& evt) {
+void Player::handle_key_event(const SEvent& evt) {
     unsigned cmd;
     switch (evt.KeyInput.Key) {
         case irr::KEY_KEY_W:
@@ -38,7 +38,7 @@ void PlayerGameObj::handle_key_event(const SEvent& evt) {
     move_cmd[cmd] = evt.KeyInput.PressedDown;
 }
 
-void PlayerGameObj::logic_tick(GameLoop& loop) {
+void Player::logic_tick(GameLoop& loop) {
 
     // for testing purposes
     float movement_velocity = 0.01;
@@ -84,7 +84,7 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // Get the previous velocity. The acceleration we get depends on this.
     const btVector3& velocity = rigid_body->getLinearVelocity();
-    
+
     // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
     const float vellenght = velocity.length();
     movement *= 1/(vellenght > 0.01 ? vellenght : 0.01);
@@ -101,11 +101,11 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     }
 }
 
-void PlayerGameObj::render(GameLoop&, float) {
+void Player::render(GameLoop&, float) {
     // all done by irr
 }
 
-btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_pos) {
+btRigidBody* Player::initialize(GameLoop& loop, const vector3df& start_pos) {
     (loop.get_event_receiver())->attach(this, irr::EET_KEY_INPUT_EVENT);
 
     SKeyMap *keyMap;
@@ -153,7 +153,7 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
 }
 
 
-void PlayerGameObj::collision_callback(const btCollisionObject* obj) {
+void Player::collision_callback(const btCollisionObject* obj) {
     const btRigidBody* rb = btRigidBody::upcast(obj);
     const btMotionState* motion = nullptr;
     const IGameObject* gobj = nullptr;
@@ -161,7 +161,7 @@ void PlayerGameObj::collision_callback(const btCollisionObject* obj) {
         motion = rb->getMotionState();
         gobj = dynamic_cast<const IGameObject*> (motion);
     }
-    
+
     if(gobj) {
         // do something other than the end?
         const LevelEndObj* end = dynamic_cast<const LevelEndObj*>(gobj);

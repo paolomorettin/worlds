@@ -6,12 +6,12 @@
 #include <irrlicht.h>
 
 class GameLoop;
-class PlayerGameObj;
+class Player;
 
 
 class GameScene : public IScene {
     const float world_scale = 1; // affects structures
-    PlayerGameObj* playerObj = nullptr;
+    Player* playerObj = nullptr;
 
  public:
     virtual bool create_scene(GameLoop& loop);
