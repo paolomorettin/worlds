@@ -64,7 +64,7 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     // Convert to a bullet vector
     btVector3 direction = btVector3(camMovement.X, camMovement.Y, camMovement.Z);
     btVector3 movement = btVector3(0,0,0);
-
+    
     // check for keyboard input
     if (move_cmd[FORWARD]) {
         movement += direction;
@@ -80,6 +80,10 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     if (movement != btVector3(0,0,0)) {
         movement = movement.normalize()* movement_velocity;
+    } else {
+      // Sounds a bit of a hack to me, never mind.
+      const float y_velocity = rigid_body->getLinearVelocity()[1];
+      rigid_body -> setLinearVelocity(btVector3(0,y_velocity,0));
     }
 
     // Get the previous velocity. The acceleration we get depends on this.
@@ -90,7 +94,7 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     movement *= 1/(vellenght > 0.01 ? vellenght : 0.01);
     // impulse for the movement!
     rigid_body -> applyCentralImpulse(movement);
-
+    
     if (move_cmd[JUMP] && velocity.y() < 0 ) {
         rigid_body -> applyCentralImpulse(btVector3(0, jump_strength, 0));
     }
