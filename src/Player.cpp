@@ -89,7 +89,12 @@ void Player::logic_tick(GameLoop& loop) {
     const btVector3 air_resistance((velocity.x()*velocity.x()*velocity.x())/100,
                                    (velocity.y()*velocity.y()*velocity.y())/100,
                                    (velocity.z()*velocity.z()*velocity.z())/100);
+
+    const btVector3 slow_slowdown(velocity.length2() > 0.0001? velocity.normalized()/300 : velocity);
+
     movement -= air_resistance;
+    movement -= slow_slowdown;
+
     if (movement != btVector3(0,0,0)) {
         // Speed modulation: get the "coefficient of change"
         // 1 = trying to accelerate in the reverse direction of the movement.
