@@ -87,18 +87,18 @@ btRigidBody* StaticStructure::initialize(GameLoop& loop, const Block& current) {
 
     switch (rand() % 3) {
         case 0 :
-            map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
-            map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,10,255);
+            //map_node -> getMaterial(0).AmbientColor = video::SColor(255,255,0,0);
+            //map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,10,255);
             map_node -> setMaterialTexture( 0, loop.smgr -> getVideoDriver() -> getTexture("./media/blue.png") );
             break;
         case 1 :
-            map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
-            map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,10,10);
+            //map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,255,0);
+            //map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,10,10);
             map_node -> setMaterialTexture( 0, loop.smgr -> getVideoDriver() -> getTexture("./media/red.png") );
             break;
         case 2 :
-            map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
-            map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,255,10);
+            //map_node -> getMaterial(0).AmbientColor = video::SColor(255,0,0,255);
+            //map_node -> getMaterial(0).DiffuseColor = video::SColor(100,10,255,10);
             map_node -> setMaterialTexture( 0, loop.smgr -> getVideoDriver() -> getTexture("./media/green.png") );
             break;
     }
