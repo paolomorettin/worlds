@@ -117,7 +117,6 @@ static void motor_post_tick_callback (btDynamicsWorld *world, btScalar timeStep)
 
 void GameLoop::handle_collisions() {
 
-    std::cout << "test"<<std::endl;
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
     for (int i=0;i<numManifolds;i++){
         btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);

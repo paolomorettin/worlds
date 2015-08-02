@@ -39,11 +39,10 @@ void PlayerGameObj::handle_key_event(const SEvent& evt) {
 void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // for testing purposes
-    float movement_velocity = 1.0;
+    float movement_velocity = 0.01;
     float jump_strength = 100.00;
 
     irr::core::vector3df cd = camera -> getTarget();
-    btVector3 direction = btVector3(1000,0,0);
 
     core::vector3df camPosition = camera->getPosition();
 
@@ -58,34 +57,40 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // scale the direction vector to a unit vector & multiply velocity.
     irr::core::vector3df camMovement = camDirection.normalize();
-    camMovement = camMovement * movement_velocity;
+    camMovement = camMovement;
 
     // Convert to a bullet vector
-    btVector3 movement = btVector3(camMovement.X, camMovement.Y, camMovement.Z);
+    btVector3 direction = btVector3(camMovement.X, camMovement.Y, camMovement.Z);
+    btVector3 movement = btVector3(0,0,0);
 
-    // Get the previous velocity. The acceleration we get depends on this.
-    const btVector3& velocity = rigid_body->getLinearVelocity();
-    // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
-
-    movement *= 1/velocity.length();
-
-    std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
     // check for keyboard input
     if (move_cmd[FORWARD]) {
-        rigid_body -> applyCentralImpulse(movement);
+        movement += direction;
     } else if (move_cmd[BACKWARD]) {
-        rigid_body -> applyCentralImpulse(-movement);
+        movement -= direction;
     }
 
     if (move_cmd[RIGHT]) {
-        printf("A\n");
+        movement += direction.rotate(btVector3(0,1,0), 90);
     } else if (move_cmd[LEFT]) {
-        printf("D\n");
+        movement -= direction.rotate(btVector3(0,1,0), 90);
     }
+
+    if (movement != btVector3(0,0,0)) {
+        movement = movement.normalize()* movement_velocity;
+    }
+
+    // Get the previous velocity. The acceleration we get depends on this.
+    const btVector3& velocity = rigid_body->getLinearVelocity();
+    
+    // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
+    const float vellenght = velocity.length();
+    movement *= 1/(vellenght > 0.01 ? vellenght : 0.01);
+    // impulse!
+    rigid_body -> applyCentralImpulse(movement);
 
     if (move_cmd[JUMP] && velocity.y() < 0 ) {
         rigid_body -> applyCentralImpulse(btVector3(0, jump_strength, 0));
-        printf("Jump like you were in Van Halen!\n");
     }
 }
 

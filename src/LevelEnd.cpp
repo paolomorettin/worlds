@@ -58,7 +58,7 @@ btGhostObject* LevelEndObj::initialize(GameLoop& loop, const irr::core::vector3d
     scene::ILightSceneNode* light2 = loop.smgr -> addLightSceneNode( 0, core::vector3df(1000,1000,1000), video::SColor(255,255,0,0), 50.0f, ID_light );
 
     ghostObject = new btGhostObject();
-    ghostObject->setCollisionShape(new btSphereShape(1));
+    ghostObject->setCollisionShape(new btSphereShape(0.5));
     // rotation not matters
     btQuaternion init_rotation(btScalar(0),btScalar(0),btScalar(0));
     // initial position of the rigid body.
