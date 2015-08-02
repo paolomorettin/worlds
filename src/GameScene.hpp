@@ -1,33 +1,27 @@
-#ifndef GAME_SCENE_H
-#define GAME_SCENE_H
+#pragma once
 
-#include "GameLoop.hpp"
+#include "IScene.hpp"
 #include "IGameObject.hpp"
-#include "LevelGenerator.hpp"
-#include "Player.hpp"
+#include "Structure.hpp"
+#include <irrlicht.h>
+
+class GameLoop;
+class PlayerGameObj;
 
 
-class MainGameScene : public IGameObject {
-public:
-
+class GameScene : public IScene {
     const float world_scale = 1; // affects structures
-
     PlayerGameObj* playerObj = nullptr;
 
-    virtual void render(GameLoop&, float);
-    virtual void logic_tick(GameLoop&);
-    virtual void notify(const irr::SEvent& evt);
-
-    bool initialize(GameLoop& loop);
-
-    virtual ~MainGameScene() {};
+ public:
+    virtual bool create_scene(GameLoop& loop);
 };
 
 
 class btRigidBody;
 
 class StaticStructure: public IGameObject {
-    scene::IAnimatedMeshSceneNode* map_node;
+    irr::scene::IAnimatedMeshSceneNode* map_node;
     Structure structure_data;
     // bullet fields are not remembered: the position is constant...
 public:
@@ -39,4 +33,3 @@ public:
 
     virtual ~StaticStructure() {};
 };
-#endif

@@ -1,14 +1,9 @@
-
 #include <irrlicht.h>
 #include <stdlib.h>
 #include <iostream>
 
-#include "EventReceiver.hpp"
-#include "Structure.hpp"
-#include "Timer.hpp"
-#include "IGameObject.hpp"
+#include "GameLoop.hpp"
 #include "GameScene.hpp"
-#include "LevelGenerator.hpp"
 
 using namespace irr;
 
@@ -27,8 +22,8 @@ int main(int argc, char** argv)
 
     loop.smgr->setAmbientLight(video::SColor(100,1,1,50));
 
-    MainGameScene game_scene;
-    game_scene.initialize(loop);
+    GameScene game_scene;
+    game_scene.create_scene(loop);
 
     // hide the cursor
     loop.device->getCursorControl() -> setVisible(false);

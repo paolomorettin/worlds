@@ -2,13 +2,14 @@
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include "LevelGenerator.hpp"
 #include "LevelEnd.hpp"
+#include "GameLoop.hpp"
+#include "Player.hpp"
 
 #include <iostream>
 
-void MainGameScene::notify(const irr::SEvent& evt) {}
 void StaticStructure::notify(const irr::SEvent& evt) {}
 
-bool MainGameScene::initialize(GameLoop& gameloop) {
+bool GameScene::create_scene(GameLoop& gameloop) {
 
     scene::ISceneManager * smgr = gameloop.smgr; // TODO: initialize
     scene::ISceneNode * parent = nullptr;
@@ -63,11 +64,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     return true;
 }
 
-void MainGameScene::render(GameLoop&, float) {
-}
 
-void MainGameScene::logic_tick(GameLoop&) {
-}
 
 
 
