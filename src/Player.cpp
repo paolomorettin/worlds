@@ -40,6 +40,7 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // for testing purposes
     float movement_velocity = 1.0;
+    float jump_strength = 100.00;
     
     irr::core::vector3df cd = camera -> getTarget();
     btVector3 direction = btVector3(1000,0,0);
@@ -52,19 +53,28 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     // figure out the 'direction' vector that describes the relative position of the camera to it's target:
     irr::core::vector3df camDirection = camTarget - camPosition;
 
-    // scale the direction vector for frame-rate independent speed:
+    // Don't allow the modification of up/down velocity. Flatten down the camera vector to the XZ plane.
+    camDirection.Y = 0;
+    
+    // scale the direction vector to a unit vector & multiply velocity.
     irr::core::vector3df camMovement = camDirection.normalize();
     camMovement = camMovement * movement_velocity;
 
+    // Convert to a bullet vector
     btVector3 movement = btVector3(camMovement.X, camMovement.Y, camMovement.Z);
 
+    // Get the previous velocity. The acceleration we get depends on this.
+    const btVector3& velocity = rigid_body->getLinearVelocity();
+    // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
 
+    movement *= 1/velocity.length();
+    
     std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
     // check for keyboard input
     if (move_cmd[FORWARD]) {
-        rigid_body -> setLinearVelocity(movement);
+        rigid_body -> applyCentralImpulse(movement);
     } else if (move_cmd[BACKWARD]) {
-        rigid_body -> setLinearVelocity(-movement);
+        rigid_body -> applyCentralImpulse(-movement);
     }
 
     if (move_cmd[RIGHT]) {
@@ -73,7 +83,8 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
         printf("D\n");
     }
 
-    if (move_cmd[JUMP]) {
+    if (move_cmd[JUMP] && velocity.y() < 0 ) {
+        rigid_body -> applyCentralImpulse(btVector3(0, jump_strength, 0));
         printf("Jump like you were in Van Halen!\n");
     }
 }
