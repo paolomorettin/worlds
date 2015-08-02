@@ -64,7 +64,7 @@ bool GameScene::create_scene(GameLoop& gameloop) {
 
     // Create player
     playerObj = new Player();
-    btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
+    btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp, level_timer);
     gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
     // just as a test, start with some initial velocity
     return true;

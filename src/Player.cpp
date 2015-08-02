@@ -1,12 +1,12 @@
 #include "Player.hpp"
 #include "LevelGenerator.hpp"
 #include "LevelEnd.hpp"
+#include "LevelTimer.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include <iostream>
 #include <irrlicht.h>
 #include <iostream>
 #include <cmath>
-
 
 void Player::notify (const SEvent& evt) {
     if (evt.EventType == irr::EET_KEY_INPUT_EVENT)
@@ -122,9 +122,11 @@ void Player::render(GameLoop&, float) {
     // all done by irr
 }
 
-btRigidBody* Player::initialize(GameLoop& loop, const vector3df& start_pos) {
+btRigidBody* Player::initialize(GameLoop& loop, const vector3df& start_pos, LevelTimer* timer) {
     (loop.get_event_receiver())->attach(this, irr::EET_KEY_INPUT_EVENT);
 
+    this->level_timer = timer;
+    
     SKeyMap *keyMap;
     int ID_camera = 0; // <- are you kidding me? no.
     this->camera = loop.smgr -> addCameraSceneNodeFPS(0, 100, 0.3, ID_camera, keyMap, 0, true, 10);
@@ -183,7 +185,9 @@ void Player::collision_callback(const btCollisionObject* obj) {
         // do something other than the end?
         const LevelEndObj* end = dynamic_cast<const LevelEndObj*>(gobj);
         if(end) {
+            level_timer->stop();
             std::cout<<"You win!"<<std::endl;
+            std::cout<<"Time: "<<level_timer->get()<<std::endl;
         }
     }
 }
