@@ -100,10 +100,44 @@ void GameLoop::start_loop() {
 
 static void motor_post_tick_callback (btDynamicsWorld *world, btScalar timeStep) {
     GameLoop *loop = static_cast<GameLoop *>(world->getWorldUserInfo());
+
+    loop->handle_collisions();
+    
     // manual callbacks of "logic_tick" function for each
     // object.
     for (IGameObject* obj: loop->event_objs) {
         obj->logic_tick(*loop);
+    }
+}
+
+void GameLoop::handle_collisions() {
+
+    std::cout << "test"<<std::endl;
+    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+    for (int i=0;i<numManifolds;i++){
+        btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+        const btCollisionObject* obA = contactManifold->getBody0();
+        const btCollisionObject* obB = contactManifold->getBody1();
+
+        auto gameobjA_it = collision_objs.find(obA);
+        auto gameobjB_it = collision_objs.find(obB);
+        
+        if (gameobjA_it != collision_objs.end()) {
+            // is interested in collision notification!
+            // (and most importantly it's a real IGameObject)
+            // we are not sure if it's a real collision object there.
+            std::cout << gameobjA_it->second->name << " collides with "<<obB<<std::endl;
+            gameobjA_it->second->collision_callback(obB);
+        }
+        
+        if (gameobjB_it != collision_objs.end()) {
+            // is interested in collision notification!
+            // (and most importantly it's a real IGameObject)
+            // we are not sure if it's a real collision object there.
+            std::cout << gameobjB_it->second->name << " collides with "<<obA<<std::endl;
+            gameobjB_it->second->collision_callback(obA);
+        }
+
     }
 }
 

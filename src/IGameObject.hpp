@@ -7,6 +7,7 @@
 #include "EventReceiver.hpp"
 
 class GameLoop;
+class btCollisionObject;
 
 class IGameObject : public btMotionState{
     std::set<std::pair<EventReceiver*, irr::EEVENT_TYPE>> observed_events;
@@ -47,7 +48,7 @@ class IGameObject : public btMotionState{
 
     virtual void notify(const irr::SEvent& evt) = 0;
 
-    //! Called with a fixed rate of 100Hz
+    //! Called with a fixed rate of 300Hz
     /*!
      * Here you should handle the logic, the network and all the
      * non-graphic-related tasks.
@@ -69,6 +70,11 @@ class IGameObject : public btMotionState{
         m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset ;
     }
 
+
+    // Called to notify that a collision happened.
+    virtual void collision_callback(const btCollisionObject* other_obj) {
+        // do nothing by default.
+    }
 
     virtual ~IGameObject() {
         for (auto evt : observed_events) {
