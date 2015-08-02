@@ -1,6 +1,6 @@
-#include "Structure.hpp"
+#include "Block.hpp"
 
-Structure::Structure(int pos_x, int pos_y, int pos_z, int size_x, int size_y, int size_z){
+Block::Block(int pos_x, int pos_y, int pos_z, int size_x, int size_y, int size_z){
     this -> pos_x = pos_x;
     this -> pos_y = pos_y;
     this -> pos_z = pos_z;

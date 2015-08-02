@@ -17,10 +17,10 @@ bool GameScene::create_scene(GameLoop& gameloop) {
     core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
     LevelGenerator level = LevelGenerator(level_size,1000);
 
-    core::list<Structure> * structures = level.getStructures();
+    core::list<Block> * structures = level.getStructures();
 
     // create the structures
-    for (Structure& current: *structures) {
+    for (Block& current: *structures) {
         StaticStructure* structure = new StaticStructure();
         current.size_x *= world_scale;
         current.size_y *= world_scale;
@@ -73,7 +73,7 @@ void StaticStructure::logic_tick(GameLoop&) { }
 
 void StaticStructure::render(GameLoop&, float) { }
 
-btRigidBody* StaticStructure::initialize(GameLoop& loop, const Structure& current) {
+btRigidBody* StaticStructure::initialize(GameLoop& loop, const Block& current) {
 
     core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
     core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
