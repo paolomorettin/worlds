@@ -104,7 +104,7 @@ void Player::logic_tick(GameLoop& loop) {
         rigid_body -> applyCentralImpulse(movement);
     }
 
-    if (move_cmd[JUMP] && velocity.y() < 0 ) {
+    if (move_cmd[JUMP] && velocity.y() <= 0 ) {
         rigid_body -> applyCentralImpulse(btVector3(0, jump_strength, 0));
     }
 
