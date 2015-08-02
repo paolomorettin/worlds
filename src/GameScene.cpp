@@ -53,13 +53,13 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     vector3df ep = core::vector3df(1.0/2) + vector3df(endcell.X, endcell.Y, endcell.Z);
     ep *= world_scale;
     LevelEndObj* levelend = new LevelEndObj();
-    btGhostObject* end_point_rb = levelend->initialize(gameloop, ep);
+    btRigidBody* end_point_rb = levelend->initialize(gameloop, ep);
 
     playerObj = new PlayerGameObj();
     btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
     gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
+    gameloop.dynamicsWorld->addRigidBody(end_point_rb);
     // just as a test, start with some initial velocity
-    player_rigid_body->setActivationState(DISABLE_DEACTIVATION);
     return true;
 }
 

@@ -145,6 +145,7 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     // add the rigid body
     // mass of 80 kg.
     rigid_body = new btRigidBody(mass, this, sphere, inertiavector);
+    rigid_body->setActivationState(DISABLE_DEACTIVATION);
 
     loop.register_collision_callback(rigid_body, this);
     return rigid_body;
@@ -162,12 +163,10 @@ void PlayerGameObj::collision_callback(const btCollisionObject* obj) {
     }
     
     if(gobj) {
-        std::cout<< "(that is a " << gobj->name <<")" << std::endl;
         // do something other than the end?
         const LevelEndObj* end = dynamic_cast<const LevelEndObj*>(gobj);
         if(end) {
             std::cout<<"You win!"<<std::endl;
-            exit(0);
         }
     }
 }

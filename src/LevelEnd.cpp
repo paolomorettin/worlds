@@ -5,7 +5,7 @@
 using namespace irr;
 using namespace irr::core;
 
-btGhostObject* LevelEndObj::initialize(GameLoop& loop, const irr::core::vector3df& position) {
+btRigidBody* LevelEndObj::initialize(GameLoop& loop, const irr::core::vector3df& position) {
 
     map_node = loop.smgr -> addSphereSceneNode(0.5);
     map_node -> getMaterial(0).DiffuseColor = video::SColor(100,255,100,255);
@@ -68,17 +68,18 @@ btGhostObject* LevelEndObj::initialize(GameLoop& loop, const irr::core::vector3d
     // model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
     btCollisionShape* sphere = new btSphereShape(0.5);
     // inertia vector:
-    // mass of 80 kg.
-    const btScalar mass = 80;
+    // mass of 10 kg.
+    const btScalar mass = 10;
     btVector3 inertiavector(0,0,0);
     sphere->calculateLocalInertia(mass, inertiavector);
 
     // add the rigid body
-    // mass of 80 kg.
     rigid_body = new btRigidBody(mass, this, sphere, inertiavector);
+    //rigid_body->setActivationState(DISABLE_DEACTIVATION);
 
-    loop.dynamicsWorld->addCollisionObject(rigid_body);
     loop.attach(this);
+
+    return rigid_body;
 
 }
 

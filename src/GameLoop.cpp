@@ -4,9 +4,13 @@
 #include <bullet/BulletCollision/CollisionDispatch/btGhostObject.h>
 
 #define DEBUG_PHYSOBJECTS 0
+#define DEBUG_PHYSOBJECTS_FILTER_RE ".*End.*"
 
 // for debug
+#if DEBUG_PHYSOBJECTS
 #include <iostream>
+#include <regex>
+#endif
 
 // a bit crude, but works.
 #define PRINTVEC(vec) vec.x()<<","<<vec.y()<<","<<vec.z()
@@ -68,6 +72,8 @@ void GameLoop::start_loop() {
 
 #if DEBUG_PHYSOBJECTS
             { // FIXME: Debug print of all objects...
+                std::basic_regex<char> my_regex(DEBUG_PHYSOBJECTS_FILTER_RE);
+                
                 btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
                 for (int j = 0; j < dynamicsWorld->getNumCollisionObjects(); j++) {
                     btRigidBody* body = ((btRigidBody*)objs[j]);
@@ -84,10 +90,12 @@ void GameLoop::start_loop() {
                     if (itemname == std::string()) {
                         itemname = "[Not an IGameObject]";
                     }
-                    std::cout<<" - '"<<itemname<<"'"<<std::endl;
-                    std::cout<<"    - pos   : "<<PRINTVEC(position) << std::endl;
-                    std::cout<<"    - linvel: "<<PRINTVEC(linearvelocity) << std::endl;
-                    std::cout<<"    - angvel: "<<PRINTVEC(angualrvelocity) << std::endl;
+                    if(std::regex_match(itemname, my_regex)) {
+                        std::cout<<" - '"<<itemname<<"'"<<std::endl;
+                        std::cout<<"    - pos   : "<<PRINTVEC(position) << std::endl;
+                        std::cout<<"    - linvel: "<<PRINTVEC(linearvelocity) << std::endl;
+                        std::cout<<"    - angvel: "<<PRINTVEC(angualrvelocity) << std::endl;
+                    }
                 }
             }
 #endif

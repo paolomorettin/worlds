@@ -5,6 +5,8 @@
 #include "IGameObject.hpp"
 #include <irrlicht.h>
 
+#include <iostream>
+
 class LevelEndObj: public IGameObject {
     irr::scene::IMeshSceneNode* map_node;
     btRigidBody *rigid_body;
@@ -25,7 +27,7 @@ class LevelEndObj: public IGameObject {
     }
 
 
-    virtual btGhostObject* initialize(GameLoop&, const irr::core::vector3df& position);
+    virtual btRigidBody* initialize(GameLoop&, const irr::core::vector3df& position);
     virtual void notify(const irr::SEvent& evt);
 
     virtual ~LevelEndObj() {};
