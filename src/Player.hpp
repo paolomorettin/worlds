@@ -6,7 +6,7 @@
 
 class btRigidBody;
 
-class PlayerGameObj : public IGameObject {
+class Player : public IGameObject {
     scene::ICameraSceneNode *camera; // irr camera
     scene::ILightSceneNode *playerlight; // irr light that follows the player.
     btRigidBody *rigid_body;
@@ -24,7 +24,7 @@ class PlayerGameObj : public IGameObject {
 
  public:
 
-    explicit PlayerGameObj():
+    explicit Player():
         IGameObject("Player"), playerlight(nullptr), camera(nullptr), rigid_body(nullptr)
     {
         for (int i=0; i<NUM_OF_MOVES; i++) {
@@ -48,6 +48,6 @@ class PlayerGameObj : public IGameObject {
 
     virtual void collision_callback(const btCollisionObject* obj);
 
-    virtual ~PlayerGameObj() {};
+    virtual ~Player() {};
 };
 

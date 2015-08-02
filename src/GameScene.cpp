@@ -2,13 +2,14 @@
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include "LevelGenerator.hpp"
 #include "LevelEnd.hpp"
+#include "GameLoop.hpp"
+#include "Player.hpp"
 
 #include <iostream>
 
-void MainGameScene::notify(const irr::SEvent& evt) {}
 void StaticStructure::notify(const irr::SEvent& evt) {}
 
-bool MainGameScene::initialize(GameLoop& gameloop) {
+bool GameScene::create_scene(GameLoop& gameloop) {
 
     scene::ISceneManager * smgr = gameloop.smgr; // TODO: initialize
     scene::ISceneNode * parent = nullptr;
@@ -16,10 +17,10 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     core::vector3d<int> level_size = core::vector3d<int>(50,100,50);
     LevelGenerator level = LevelGenerator(level_size,1000);
 
-    core::list<Structure> * structures = level.getStructures();
+    core::list<Block> * structures = level.getStructures();
 
     // create the structures
-    for (Structure& current: *structures) {
+    for (Block& current: *structures) {
         StaticStructure* structure = new StaticStructure();
         current.size_x *= world_scale;
         current.size_y *= world_scale;
@@ -55,7 +56,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     LevelEndObj* levelend = new LevelEndObj();
     btRigidBody* end_point_rb = levelend->initialize(gameloop, ep);
 
-    playerObj = new PlayerGameObj();
+    playerObj = new Player();
     btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp);
     gameloop.dynamicsWorld->addRigidBody(player_rigid_body);
     gameloop.dynamicsWorld->addRigidBody(end_point_rb);
@@ -63,11 +64,7 @@ bool MainGameScene::initialize(GameLoop& gameloop) {
     return true;
 }
 
-void MainGameScene::render(GameLoop&, float) {
-}
 
-void MainGameScene::logic_tick(GameLoop&) {
-}
 
 
 
@@ -76,7 +73,7 @@ void StaticStructure::logic_tick(GameLoop&) { }
 
 void StaticStructure::render(GameLoop&, float) { }
 
-btRigidBody* StaticStructure::initialize(GameLoop& loop, const Structure& current) {
+btRigidBody* StaticStructure::initialize(GameLoop& loop, const Block& current) {
 
     core::vector3df position = core::vector3df(current.pos_x, current.pos_y, current.pos_z);
     core::vector3df size = core::vector3df(current.size_x, current.size_y, current.size_z);
