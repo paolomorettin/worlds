@@ -22,10 +22,10 @@ class PlayerGameObj : public IGameObject {
 
     void handle_key_event(const SEvent&);
 
-public:
+ public:
 
     explicit PlayerGameObj():
-            IGameObject("Player"), playerlight(nullptr), camera(nullptr), rigid_body(nullptr)
+        IGameObject("Player"), playerlight(nullptr), camera(nullptr), rigid_body(nullptr)
     {
         for (int i=0; i<NUM_OF_MOVES; i++) {
             move_cmd[i] = false;

@@ -29,7 +29,7 @@ class IGameObject : public btMotionState{
         }
     }
 
- public:
+    public:
     btTransform m_graphicsWorldTrans;
     btTransform m_centerOfMassOffset;
     btTransform m_startWorldTrans;
@@ -38,9 +38,9 @@ class IGameObject : public btMotionState{
 
     explicit IGameObject(std::string name = std::string("[unknown]"))
         : btMotionState(), name(name),
-          m_graphicsWorldTrans(btTransform::getIdentity()),
-          m_centerOfMassOffset(btTransform::getIdentity()),
-          m_startWorldTrans(btTransform::getIdentity())
+        m_graphicsWorldTrans(btTransform::getIdentity()),
+        m_centerOfMassOffset(btTransform::getIdentity()),
+        m_startWorldTrans(btTransform::getIdentity())
     {
     }
 
@@ -58,7 +58,7 @@ class IGameObject : public btMotionState{
     // Called by bullet
     virtual void getWorldTransform(btTransform& centerOfMassWorldTrans ) const
     {
-            centerOfMassWorldTrans = m_centerOfMassOffset.inverse() * m_graphicsWorldTrans ;
+        centerOfMassWorldTrans = m_centerOfMassOffset.inverse() * m_graphicsWorldTrans ;
     }
 
     ///synchronizes world transform from physics to user
@@ -66,7 +66,7 @@ class IGameObject : public btMotionState{
     ///Bullet only calls the update of worldtransform for active objects
     virtual void setWorldTransform(const btTransform& centerOfMassWorldTrans)
     {
-            m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset ;
+        m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset ;
     }
 
 

@@ -12,17 +12,17 @@ using namespace core;
 
 class LevelGenerator {
  public:
-	LevelGenerator(vector3d<int>,int);
+    LevelGenerator(vector3d<int>,int);
 
-	list<Structure>* getStructures();
-	vector3d<int> getSize();
-	vector3d<int> getStart();
-	vector3d<int> getEnd();
+    list<Structure>* getStructures();
+    vector3d<int> getSize();
+    vector3d<int> getStart();
+    vector3d<int> getEnd();
 
  private:
-	list<Structure> structures;
-	vector3d<int> size;
-	vector3d<int> start;
-	vector3d<int> end;
+    list<Structure> structures;
+    vector3d<int> size;
+    vector3d<int> start;
+    vector3d<int> end;
 
 };

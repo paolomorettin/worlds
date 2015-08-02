@@ -8,35 +8,35 @@
 
 
 class MainGameScene : public IGameObject {
- public:
+public:
 
-	const float world_scale = 1; // affects structures
-	
-	PlayerGameObj* playerObj = nullptr;
+    const float world_scale = 1; // affects structures
 
-	virtual void render(GameLoop&, float);
-	virtual void logic_tick(GameLoop&);
+    PlayerGameObj* playerObj = nullptr;
+
+    virtual void render(GameLoop&, float);
+    virtual void logic_tick(GameLoop&);
     virtual void notify(const irr::SEvent& evt);
 
     bool initialize(GameLoop& loop);
-	
-	virtual ~MainGameScene() {};
+
+    virtual ~MainGameScene() {};
 };
 
 
 class btRigidBody;
 
 class StaticStructure: public IGameObject {
-	scene::IAnimatedMeshSceneNode* map_node;
-	Structure structure_data;
-	// bullet fields are not remembered: the position is constant...
- public:
-	explicit StaticStructure(): structure_data(0,0,0,0,0,0), map_node(nullptr) {};
-	virtual void render(GameLoop&, float);
-	virtual btRigidBody* initialize(GameLoop&, const Structure& structure_data);
-	virtual void logic_tick(GameLoop&);
+    scene::IAnimatedMeshSceneNode* map_node;
+    Structure structure_data;
+    // bullet fields are not remembered: the position is constant...
+public:
+    explicit StaticStructure(): structure_data(0,0,0,0,0,0), map_node(nullptr) {};
+    virtual void render(GameLoop&, float);
+    virtual btRigidBody* initialize(GameLoop&, const Structure& structure_data);
+    virtual void logic_tick(GameLoop&);
     virtual void notify(const irr::SEvent& evt);
 
-	virtual ~StaticStructure() {};
+    virtual ~StaticStructure() {};
 };
 #endif

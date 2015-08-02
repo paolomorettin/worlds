@@ -41,12 +41,12 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     // for testing purposes
     float movement_velocity = 1.0;
     float jump_strength = 100.00;
-    
+
     irr::core::vector3df cd = camera -> getTarget();
     btVector3 direction = btVector3(1000,0,0);
 
     core::vector3df camPosition = camera->getPosition();
-    
+
     // get the 'position' of the thing that the camera (node) is pointed at
     irr::core::vector3df camTarget = camera->getTarget();
 
@@ -55,7 +55,7 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
 
     // Don't allow the modification of up/down velocity. Flatten down the camera vector to the XZ plane.
     camDirection.Y = 0;
-    
+
     // scale the direction vector to a unit vector & multiply velocity.
     irr::core::vector3df camMovement = camDirection.normalize();
     camMovement = camMovement * movement_velocity;
@@ -68,7 +68,7 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
 
     movement *= 1/velocity.length();
-    
+
     std::cout <<"Endl:" << movement.x() <<" " << movement.y() <<" " << movement.z() << std::endl;
     // check for keyboard input
     if (move_cmd[FORWARD]) {
@@ -109,7 +109,7 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     // Only a rename, sorry!
     const vector3df& sp = start_pos;
     // player obj test
-    // TODO: All of the following should be moved into playergameobj.initialize 
+    // TODO: All of the following should be moved into playergameobj.initialize
     //std::cout<<"START PLAYER POS:"<<sp.X<<","<<sp.Y<<","<<sp.Z<<","<<std::endl;
     // from euler angles, other constructors should be preferred (I
     // think)

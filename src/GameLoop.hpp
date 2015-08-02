@@ -20,31 +20,31 @@ using namespace irr;
 
 class GameLoop {
     EventReceiver *ev_recv;
-public:
+    public:
 
     GameLoop();
     ~GameLoop();
 
-  IrrlichtDevice *device;
-  video::IVideoDriver* driver;
-  gui::IGUIEnvironment* guienv;
-  scene::ISceneManager* smgr;
-  ITimer* timer;
+    IrrlichtDevice *device;
+    video::IVideoDriver* driver;
+    gui::IGUIEnvironment* guienv;
+    scene::ISceneManager* smgr;
+    ITimer* timer;
 
-  btDefaultCollisionConfiguration* config;
-  btCollisionDispatcher* dispatcher;
-  btBroadphaseInterface* overlappingpaircache;
-  btSequentialImpulseConstraintSolver* solver;
-  btDiscreteDynamicsWorld* dynamicsWorld;
+    btDefaultCollisionConfiguration* config;
+    btCollisionDispatcher* dispatcher;
+    btBroadphaseInterface* overlappingpaircache;
+    btSequentialImpulseConstraintSolver* solver;
+    btDiscreteDynamicsWorld* dynamicsWorld;
 
-  std::vector<IGameObject*> event_objs;
+    std::vector<IGameObject*> event_objs;
 
-  void attach(IGameObject*);
-  void detach(IGameObject*);
+    void attach(IGameObject*);
+    void detach(IGameObject*);
 
-  bool initialize_irrlicht(/* config manager */);
-  bool initialize_bullet(/* config manager */);
-  void start_loop();
+    bool initialize_irrlicht(/* config manager */);
+    bool initialize_bullet(/* config manager */);
+    void start_loop();
 
     inline EventReceiver* get_event_receiver() {
         return ev_recv;

@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
     // hide the cursor
     loop.device->getCursorControl() -> setVisible(false);
-  
+
     loop.start_loop();
     return 0;
 }
