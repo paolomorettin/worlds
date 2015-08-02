@@ -130,7 +130,6 @@ void GameLoop::handle_collisions() {
             // is interested in collision notification!
             // (and most importantly it's a real IGameObject)
             // we are not sure if it's a real collision object there.
-            std::cout << gameobjA_it->second->name << " collides with "<<obB<<std::endl;
             gameobjA_it->second->collision_callback(obB);
         }
         
@@ -138,7 +137,6 @@ void GameLoop::handle_collisions() {
             // is interested in collision notification!
             // (and most importantly it's a real IGameObject)
             // we are not sure if it's a real collision object there.
-            std::cout << gameobjB_it->second->name << " collides with "<<obA<<std::endl;
             gameobjB_it->second->collision_callback(obA);
         }
 

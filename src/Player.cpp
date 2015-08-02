@@ -1,8 +1,10 @@
 #include "Player.hpp"
 #include "LevelGenerator.hpp"
+#include "LevelEnd.hpp"
 #include <bullet/BulletDynamics/btBulletDynamicsCommon.h>
 #include <iostream>
 #include <irrlicht.h>
+#include <iostream>
 
 
 void PlayerGameObj::notify (const SEvent& evt) {
@@ -86,11 +88,16 @@ void PlayerGameObj::logic_tick(GameLoop& loop) {
     // Speed modulation: add diminishing returns of the acceleration (don't accelerate to infinity)
     const float vellenght = velocity.length();
     movement *= 1/(vellenght > 0.01 ? vellenght : 0.01);
-    // impulse!
+    // impulse for the movement!
     rigid_body -> applyCentralImpulse(movement);
 
     if (move_cmd[JUMP] && velocity.y() < 0 ) {
         rigid_body -> applyCentralImpulse(btVector3(0, jump_strength, 0));
+    }
+
+    if(camPosition.Y < -10) {
+        std::cout<<"You lose(r)!"<<std::endl;
+        exit(0);
     }
 }
 
@@ -127,16 +134,40 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     setWorldTransform(transform);
 
     // model of the player in the physicial world: A BIG ROUND SPHERE: you fat!
-    btCollisionShape* sphere = new btSphereShape(0.2);
+    btCollisionShape* sphere = new btSphereShape(0.4);
 
-    // inertia vector.
-    btVector3 inertiavector(0.1,0.1,0.1);
+    // inertia vector:
+    // mass of 80 kg.
+    const btScalar mass = 80;
+    btVector3 inertiavector(0,0,0);
+    sphere->calculateLocalInertia(mass, inertiavector);
 
     // add the rigid body
     // mass of 80 kg.
-    rigid_body = new btRigidBody(80, this, sphere, inertiavector);
-    
+    rigid_body = new btRigidBody(mass, this, sphere, inertiavector);
+
     loop.register_collision_callback(rigid_body, this);
     return rigid_body;
 
+}
+
+
+void PlayerGameObj::collision_callback(const btCollisionObject* obj) {
+    const btRigidBody* rb = btRigidBody::upcast(obj);
+    const btMotionState* motion = nullptr;
+    const IGameObject* gobj = nullptr;
+    if(rb) {
+        motion = rb->getMotionState();
+        gobj = dynamic_cast<const IGameObject*> (motion);
+    }
+    
+    if(gobj) {
+        std::cout<< "(that is a " << gobj->name <<")" << std::endl;
+        // do something other than the end?
+        const LevelEndObj* end = dynamic_cast<const LevelEndObj*>(gobj);
+        if(end) {
+            std::cout<<"You win!"<<std::endl;
+            exit(0);
+        }
+    }
 }

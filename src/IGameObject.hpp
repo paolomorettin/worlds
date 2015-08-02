@@ -53,7 +53,8 @@ class IGameObject : public btMotionState{
      * Here you should handle the logic, the network and all the
      * non-graphic-related tasks.
      */
-    virtual void logic_tick(GameLoop& mgr) = 0;
+    virtual void logic_tick(GameLoop& mgr) {
+    }
 
     ///synchronizes world transform from user to physics
     // Called by bullet

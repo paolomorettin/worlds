@@ -46,6 +46,8 @@ class PlayerGameObj : public IGameObject {
     virtual void notify(const SEvent&);
     virtual void logic_tick(GameLoop&);
 
+    virtual void collision_callback(const btCollisionObject* obj);
+
     virtual ~PlayerGameObj() {};
 };
 

@@ -6,8 +6,8 @@
 #include <irrlicht.h>
 
 class LevelEndObj: public IGameObject {
-    irr::scene::IAnimatedMeshSceneNode* map_node;
-    btGhostObject *ghostObject;
+    irr::scene::IMeshSceneNode* map_node;
+    btRigidBody *rigid_body;
     public:
 
     explicit LevelEndObj():
@@ -15,8 +15,17 @@ class LevelEndObj: public IGameObject {
     {
     }
 
+    // virtual (override of IGameObject)
+    // called by bullet
+    virtual void setWorldTransform(const btTransform& centerOfMassWorldTrans)
+    {
+        IGameObject::setWorldTransform(centerOfMassWorldTrans);
+        btVector3 pos = m_graphicsWorldTrans.getOrigin();
+        map_node->setPosition(core::vector3df(pos.x(), pos.y(), pos.z()));
+    }
+
+
     virtual btGhostObject* initialize(GameLoop&, const irr::core::vector3df& position);
-    virtual void logic_tick(GameLoop&);
     virtual void notify(const irr::SEvent& evt);
 
     virtual ~LevelEndObj() {};
