@@ -47,8 +47,8 @@ class GameLoop {
     void detach(IGameObject*);
 
 
-    void register_collision_callback(btCollisionObject*, IGameObject*);
-    void remove_collision_callback(btCollisionObject*, IGameObject*);
+    void register_collision_callback(const btCollisionObject*, IGameObject*);
+    void remove_collision_callback(const btCollisionObject*);
     void handle_collisions();
     
     bool initialize_irrlicht(/* config manager */);

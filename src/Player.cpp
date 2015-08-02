@@ -130,6 +130,8 @@ btRigidBody* PlayerGameObj::initialize(GameLoop& loop, const vector3df& start_po
     // add the rigid body
     // mass of 80 kg.
     rigid_body = new btRigidBody(80, this, sphere, inertiavector);
+    
+    loop.register_collision_callback(rigid_body, this);
     return rigid_body;
 
 }

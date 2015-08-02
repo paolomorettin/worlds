@@ -32,7 +32,12 @@ void GameLoop::detach(IGameObject* obj) {
         event_objs.erase(iter);
     }
 }
-
+void GameLoop::register_collision_callback(const btCollisionObject* key, IGameObject* val) {
+    collision_objs[key] = val;
+}
+void GameLoop::remove_collision_callback(const btCollisionObject* key) {
+    collision_objs.erase(key);
+}
 void GameLoop::start_loop() {
     u32 last_frame_time = timer->getTime();
     float time_scale = 1; // change for fun effects
