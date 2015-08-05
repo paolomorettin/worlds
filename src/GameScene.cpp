@@ -62,6 +62,10 @@ bool GameScene::create_scene(GameLoop& gameloop) {
     level_timer->initialize(gameloop);
     level_timer->start();
 
+    // Create sky (dome or box?)
+    sky = smgr->addSkyDomeSceneNode(smgr -> getVideoDriver() -> getTexture("./media/skydome.jpg"),16,8,0.9,1.0f,500.0);
+    smgr -> getVideoDriver() ->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
+
     // Create player
     playerObj = new Player();
     btRigidBody* player_rigid_body = playerObj->initialize(gameloop, sp, level_timer);

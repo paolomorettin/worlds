@@ -13,7 +13,7 @@ class GameScene : public IScene {
     const float world_scale = 1; // affects structures
     Player* playerObj = nullptr;
     LevelTimer* level_timer = nullptr;
-
+    irr::scene::ISceneNode* sky;
  public:
     virtual bool create_scene(GameLoop& loop);
 };
