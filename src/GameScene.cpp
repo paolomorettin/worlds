@@ -63,7 +63,7 @@ bool GameScene::create_scene(GameLoop& gameloop) {
     level_timer->start();
 
     // Create sky (dome or box?)
-    sky = smgr->addSkyDomeSceneNode(smgr -> getVideoDriver() -> getTexture("./media/skydome.jpg"),16,8,0.9,1.0f,500.0);
+    sky = smgr->addSkyDomeSceneNode(smgr -> getVideoDriver() -> getTexture("./media/skydome.jpg"),16,8,0.5,2.0,100.0);
     smgr -> getVideoDriver() ->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
 
     // Create player
